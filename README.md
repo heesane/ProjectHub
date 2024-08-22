@@ -20,12 +20,11 @@
 * ID, Password, 닉네임을 입력받아 구현
   
 ### My Profile
-* 닉네임, 주 사용기술, 등록한 프로젝트 관리
-* 주 사용기술 수정 가능
+* 닉네임, 등록한 프로젝트 관리
 * 등록한 유저에 한하여 해당 프로젝트를 공개/비공개 전환 가능
 
 * 서비스 이용
-** 로그인 시에만 댓글과 좋아요 가능
+  ** 로그인 시에만 댓글과 좋아요 가능
   
 ### Project
 * 전체 조회 및 필터링
@@ -35,10 +34,10 @@
 * 단건 조회
   * 해당 프로젝트의 상세 정보 반환, 좋아요 갯수, 댓글 수, 댓글 내용
 * 등록
-  * 프로젝트 이름, 주제, Github Link, 기능, 기여 내용, System Architecture, Skill, Tool
-  * System Architecture는 S3를 통해서 저장 및 링크 반환
+  * 프로젝트 이름, 주제, Github Link, 기능, 기여 내용, System Architecture, ERD, Skill, Tool
+  * System Architecture, ERD는 S3를 통해서 저장 및 링크 반환
 * 수정
-  * 프로젝트 주제, 기능, 기여내용, System Architecture, Skill, Tool
+  * 프로젝트 주제, 기능, 기여내용, System Architecture, ERD, Skill, Tool
 * 삭제
   * 프로젝트 삭제
 
@@ -54,6 +53,4 @@
   * 댓글 혹은 좋아요 요청 시, 사용자의 댓글과 좋아요의 합계를 통해서 배지를 부여
 
 # ERD
-![image](https://github.com/user-attachments/assets/9b74ca20-5b38-4201-a3db-059ba190bb21)
-
-# System Architecture
+![image](https://github.com/user-attachments/assets/63b0a74c-65ff-485a-83b0-a2fe61108ada)

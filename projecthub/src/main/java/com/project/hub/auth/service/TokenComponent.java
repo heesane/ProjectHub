@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenComponent {
 
-  private Key hashedSecretKey;
+  private final Key hashedSecretKey;
 
   @Value("${jwt.secret-key}")
   private String secretKey;
@@ -38,9 +38,8 @@ public class TokenComponent {
   @Value("${jwt.token.refresh-expire-length}")
   private Long refreshExpireLength; // 리프레시 토큰의 만료 시간
 
-  @PostConstruct
-  public void init() {
-    hashedSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+  public TokenComponent(@Value("${jwt.secret-key}") String secretKey) {
+    this.hashedSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
   }
 
   public JwtToken generateToken(Long userId) {

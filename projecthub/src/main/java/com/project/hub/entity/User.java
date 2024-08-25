@@ -8,7 +8,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,4 +48,8 @@ public class User extends BaseTimeEntity {
 
   @Column(name = "refresh_token", nullable = true)
   private String refreshToken;
+
+  // 유저가 등록한 프로젝트의 리스트
+  @OneToMany(mappedBy = "user")
+  private List<Projects> projects;
 }

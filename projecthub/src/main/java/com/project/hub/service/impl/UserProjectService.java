@@ -165,6 +165,7 @@ public class UserProjectService implements ProjectService {
 
     Long userId = request.getUserId();
 
+    // 존재 여부만 파악
     User user = userRepository.findById(userId).orElseThrow(
         UserNotFoundException::new
     );

@@ -41,7 +41,6 @@ public class SecurityConfig {
             requests
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers("/**").permitAll()
-                .requestMatchers("/api/v1/auth/**").permitAll()
         )
         .sessionManagement(sessionManagement ->
             sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

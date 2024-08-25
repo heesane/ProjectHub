@@ -4,10 +4,10 @@ import static com.project.hub.model.type.ResultCode.USER_CREATED;
 import static com.project.hub.model.type.ResultCode.USER_LOGIN_SUCCESS;
 
 import com.project.hub.auth.jwt.dto.JwtToken;
-import com.project.hub.model.dto.request.UserLoginRequest;
-import com.project.hub.model.dto.request.UserRegisterRequest;
-import com.project.hub.model.dto.response.UserRegisterResponse;
-import com.project.hub.model.result.ResultResponse;
+import com.project.hub.model.dto.request.auth.UserLoginRequest;
+import com.project.hub.model.dto.request.auth.UserRegisterRequest;
+import com.project.hub.model.dto.response.ResultResponse;
+import com.project.hub.model.dto.response.auth.UserRegisterResponse;
 import com.project.hub.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +27,14 @@ public class UserAuthController {
   private final AuthService JwtAuthService;
 
   @GetMapping("")
-  public ResponseEntity<JwtToken> oauthLogin(
+  public ResponseEntity<ResultResponse> oauthLogin(
       @RequestParam("a") String accessToken,
       @RequestParam("r") String refreshToken) {
-    return ResponseEntity.ok(
-        JwtToken.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .build());
+    JwtToken jwtToken = JwtToken.builder()
+        .accessToken(accessToken)
+        .refreshToken(refreshToken)
+        .build();
+    return ResponseEntity.ok(ResultResponse.of(USER_LOGIN_SUCCESS, jwtToken));
   }
 
   @PostMapping("/login")

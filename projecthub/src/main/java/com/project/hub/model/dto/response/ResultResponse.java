@@ -1,4 +1,4 @@
-package com.project.hub.model.result;
+package com.project.hub.model.dto.response;
 
 import com.project.hub.model.type.ResultCode;
 import lombok.Getter;

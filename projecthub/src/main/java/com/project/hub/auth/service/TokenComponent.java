@@ -27,20 +27,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenComponent {
 
-  private Key secretKey;
+  private Key hashedSecretKey;
 
   @Value("${jwt.secret-key}")
-  private String SECRET_KEY;
+  private String secretKey;
 
   @Value("${jwt.token.access-expire-length}")
-  private Long ACCESS_EXPIRE_LENGTH; // 액세스 토큰의 만료 시간
+  private Long accessExpireLength; // 액세스 토큰의 만료 시간
 
   @Value("${jwt.token.refresh-expire-length}")
-  private Long REFRESH_EXPIRE_LENGTH; // 리프레시 토큰의 만료 시간
+  private Long refreshExpireLength; // 리프레시 토큰의 만료 시간
 
   @PostConstruct
   public void init() {
-    secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY));
+    hashedSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
   }
 
   public JwtToken generateToken(Long userId) {
@@ -58,8 +58,8 @@ public class TokenComponent {
     Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
     return Jwts.builder().setClaims(claims)
         .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRE_LENGTH))
-        .signWith(secretKey, SignatureAlgorithm.HS256)
+        .setExpiration(new Date(System.currentTimeMillis() + accessExpireLength))
+        .signWith(hashedSecretKey, SignatureAlgorithm.HS256)
         .compact();
   }
 
@@ -67,8 +67,8 @@ public class TokenComponent {
     // refresh에는 별다른 유저 정보가 들어가지 않는다. claims 세팅 하지 않음
     return Jwts.builder()
         .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRE_LENGTH))
-        .signWith(secretKey, SignatureAlgorithm.HS256)
+        .setExpiration(new Date(System.currentTimeMillis() + refreshExpireLength))
+        .signWith(hashedSecretKey, SignatureAlgorithm.HS256)
         .compact();
   }
 
@@ -98,7 +98,7 @@ public class TokenComponent {
   public void validateAccessToken(HttpServletRequest request) { // 만료 여부 검사
     try {
       String token = resolveAccessToken(request);
-      Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+      Jwts.parserBuilder().setSigningKey(hashedSecretKey).build().parseClaimsJws(token);
     } catch (ExpiredJwtException e) {
       throw new TokenExpiredException();
     }
@@ -107,7 +107,7 @@ public class TokenComponent {
   public void validateRefreshToken(HttpServletRequest request) {
     try {
       String token = resolveRefreshToken(request);
-      Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+      Jwts.parserBuilder().setSigningKey(hashedSecretKey).build().parseClaimsJws(token);
     } catch (ExpiredJwtException e) { // 토큰이 만료된 경우
       throw new TokenExpiredException();
     } catch (IllegalArgumentException e) { // 토큰이 비어있거나 형식이 잘못된 경우
@@ -119,7 +119,7 @@ public class TokenComponent {
     String token = resolveAccessToken(request);
     try {
       Claims claims = Jwts.parserBuilder()
-          .setSigningKey(secretKey)
+          .setSigningKey(hashedSecretKey)
           .build()
           .parseClaimsJws(token)
           .getBody();
@@ -132,7 +132,7 @@ public class TokenComponent {
   // JWT 토큰에서 클레임 추출
   public Claims extractClaims(HttpServletRequest request) {
     String accessToken = resolveAccessToken(request);
-    return Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(accessToken)
+    return Jwts.parserBuilder().setSigningKey(this.hashedSecretKey).build().parseClaimsJws(accessToken)
         .getBody();
   }
 

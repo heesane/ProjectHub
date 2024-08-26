@@ -24,18 +24,23 @@ import com.project.hub.repository.UserRepository;
 import com.project.hub.service.ProjectService;
 import com.project.hub.util.PictureManager;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Validated
 public class UserProjectService implements ProjectService {
 
   private final ProjectRepository projectRepository;
@@ -83,6 +88,12 @@ public class UserProjectService implements ProjectService {
 
   @Override
   public ListProjectResponse getMyProjectDetail(MyProjectListRequest request) {
+
+    Long userId = request.getUserId();
+
+    // 존재 여부만 파악
+    User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
     Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
 
     Sorts sort = request.getSort();
@@ -112,10 +123,12 @@ public class UserProjectService implements ProjectService {
 
   @Override
   @Transactional
-  public ResultResponse createProject(ProjectCreateRequest request)
+  public ResultResponse createProject(@Valid ProjectCreateRequest request)
       throws IOException, NoSuchAlgorithmException {
 
     Long userId = request.getUserId();
+
+    log.info("ProjectCreateRequest: {}",request);
 
     User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 

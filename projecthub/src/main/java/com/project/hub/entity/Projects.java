@@ -36,19 +36,19 @@ public class Projects extends BaseTimeEntity {
   private Long id;
 
   // 프로젝트 제목
-  @Column(name = "title")
+  @Column(name = "title",nullable = false)
   private String title;
 
   // 프로젝트 주제(요약)
-  @Column(name = "subject")
+  @Column(name = "subject",nullable = false)
   private String subject;
 
   // 프로젝트 기능
-  @Column(name = "feature")
+  @Column(name = "feature",nullable = false)
   @Lob // MarkUp Language를 저장하기 위해 Lob 사용
   private String feature;
 
-  @Column(name = "contents")
+  @Column(name = "contents",nullable = false)
   @Lob // MarkUp Language를 저장하기 위해 Lob 사용
   private String contents;
 

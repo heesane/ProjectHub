@@ -26,7 +26,7 @@ public class UserAuthController {
 
   private final AuthService JwtAuthService;
 
-  @GetMapping("")
+  @GetMapping(value="",consumes = {"application/json"})
   public ResponseEntity<ResultResponse> oauthLogin(
       @RequestParam("a") String accessToken,
       @RequestParam("r") String refreshToken) {
@@ -37,14 +37,14 @@ public class UserAuthController {
     return ResponseEntity.ok(ResultResponse.of(USER_LOGIN_SUCCESS, jwtToken));
   }
 
-  @PostMapping("/login")
+  @PostMapping(value="/login",consumes = {"multipart/form-data"})
   public ResponseEntity<ResultResponse> login(
       @RequestBody @Valid UserLoginRequest jwtLoginRequest) {
     JwtToken login = JwtAuthService.login(jwtLoginRequest);
     return ResponseEntity.ok(ResultResponse.of(USER_LOGIN_SUCCESS, login));
   }
 
-  @PostMapping("/register")
+  @PostMapping(value="/register",consumes = {"multipart/form-data"})
   public ResponseEntity<ResultResponse> register(
       @RequestBody @Valid UserRegisterRequest userRegisterRequest) {
     UserRegisterResponse register = JwtAuthService.register(userRegisterRequest);

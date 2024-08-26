@@ -32,27 +32,27 @@ public class UserProjectController {
 
   private final UserProjectService userProjectService;
 
-  @GetMapping("/list")
+  @GetMapping(value="/list",consumes = {"application/json"})
   public ResponseEntity<ResultResponse> getProjects(@RequestParam ProjectListRequest request) {
     return ResponseEntity.ok(
         ResultResponse.of(PROJECT_LIST_SUCCESS, userProjectService.listProjects(request)));
   }
 
-  @GetMapping("/detail")
+  @GetMapping(value="/detail",consumes = {"application/json"})
   public ResponseEntity<ResultResponse> getProjectDetail(
       @RequestParam @Valid ProjectRequest request) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_DETAIL_SUCCESS,
         userProjectService.getProjectDetail(request)));
   }
 
-  @GetMapping("/myproject/list")
+  @GetMapping(value = "/myproject/list",consumes = {"multipart/form-data"})
   public ResponseEntity<ResultResponse> getMyProjectDetail(
       @RequestParam @Valid MyProjectListRequest request) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_LIST_SUCCESS,
         userProjectService.getMyProjectDetail(request)));
   }
 
-  @PostMapping("/create")
+  @PostMapping(value="/create",consumes = {"multipart/form-data"})
   public ResponseEntity<ResultResponse> createProject(
       @RequestBody @Valid ProjectCreateRequest request)
       throws IOException, NoSuchAlgorithmException {
@@ -60,7 +60,7 @@ public class UserProjectController {
         userProjectService.createProject(request)));
   }
 
-  @PatchMapping("/update")
+  @PatchMapping(value="/update",consumes = {"multipart/form-data"})
   public ResponseEntity<ResultResponse> updateProject(
       @RequestBody @Valid ProjectUpdateRequest request)
       throws IOException, NoSuchAlgorithmException {
@@ -68,7 +68,7 @@ public class UserProjectController {
         userProjectService.updateProject(request)));
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping(value="/delete",consumes = {"application/json"})
   public ResponseEntity<ResultResponse> deleteProject(
       @RequestBody @Valid ProjectDeleteRequest request) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_DELETE_SUCCESS,

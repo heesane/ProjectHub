@@ -17,16 +17,19 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @Tag(name = "UserProjectController",description = "프로젝트 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/project")
@@ -35,7 +38,7 @@ public class UserProjectController {
 
   private final UserProjectService userProjectService;
 
-  @GetMapping(value="/list",consumes = {"application/json"})
+  @GetMapping(value="/list")
   @Operation(
       summary = "Get Projects",
       description = "프로젝트 리스트 조회"
@@ -45,15 +48,15 @@ public class UserProjectController {
         ResultResponse.of(PROJECT_LIST_SUCCESS, userProjectService.listProjects(request)));
   }
 
-  @GetMapping(value="/detail",consumes = {"application/json"})
+  @GetMapping(value="/{projectId}")
   @Operation(
       summary = "Get Project Detail",
       description = "프로젝트 상세 조회"
   )
   public ResponseEntity<ResultResponse> getProjectDetail(
-      @RequestParam @Valid ProjectRequest request) {
+      @PathVariable("projectId") Long projectId) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_DETAIL_SUCCESS,
-        userProjectService.getProjectDetail(request)));
+        userProjectService.getProjectDetail(ProjectRequest.of(projectId))));
   }
 
   @GetMapping(value = "/myproject/list",consumes = {"multipart/form-data"})
@@ -61,7 +64,7 @@ public class UserProjectController {
       summary = "Get My Projects",
       description = "내 프로젝트 리스트 조회"
   )
-  public ResponseEntity<ResultResponse> getMyProjectDetail(
+  public ResponseEntity<ResultResponse> getMyProjects(
       @RequestParam @Valid MyProjectListRequest request) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_LIST_SUCCESS,
         userProjectService.getMyProjectDetail(request)));

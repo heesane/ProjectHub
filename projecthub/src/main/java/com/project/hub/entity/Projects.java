@@ -114,6 +114,6 @@ public class Projects extends BaseTimeEntity {
   }
 
   public void delete() {
-    super.softDelete();
+    super.delete();
   }
 }

@@ -11,4 +11,7 @@ public class ProjectRequest {
   @Min(1)
   private final Long id;
 
+  public static ProjectRequest of(Long id) {
+    return new ProjectRequest(id);
+  }
 }

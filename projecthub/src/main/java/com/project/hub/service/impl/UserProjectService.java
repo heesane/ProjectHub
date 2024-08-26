@@ -123,7 +123,7 @@ public class UserProjectService implements ProjectService {
 
   @Override
   @Transactional
-  public ResultResponse createProject(@Valid ProjectCreateRequest request)
+  public ResultResponse createProject(ProjectCreateRequest request)
       throws IOException, NoSuchAlgorithmException {
 
     Long userId = request.getUserId();

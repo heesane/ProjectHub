@@ -11,6 +11,8 @@ import com.project.hub.model.dto.request.projects.ProjectUpdateRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.type.ResultCode;
 import com.project.hub.service.impl.UserProjectService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -25,20 +27,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Tag(name = "UserProjectController",description = "프로젝트 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/project")
+@RestController
 public class UserProjectController {
 
   private final UserProjectService userProjectService;
 
   @GetMapping(value="/list",consumes = {"application/json"})
+  @Operation(
+      summary = "Get Projects",
+      description = "프로젝트 리스트 조회"
+  )
   public ResponseEntity<ResultResponse> getProjects(@RequestParam ProjectListRequest request) {
     return ResponseEntity.ok(
         ResultResponse.of(PROJECT_LIST_SUCCESS, userProjectService.listProjects(request)));
   }
 
   @GetMapping(value="/detail",consumes = {"application/json"})
+  @Operation(
+      summary = "Get Project Detail",
+      description = "프로젝트 상세 조회"
+  )
   public ResponseEntity<ResultResponse> getProjectDetail(
       @RequestParam @Valid ProjectRequest request) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_DETAIL_SUCCESS,
@@ -46,6 +57,10 @@ public class UserProjectController {
   }
 
   @GetMapping(value = "/myproject/list",consumes = {"multipart/form-data"})
+  @Operation(
+      summary = "Get My Projects",
+      description = "내 프로젝트 리스트 조회"
+  )
   public ResponseEntity<ResultResponse> getMyProjectDetail(
       @RequestParam @Valid MyProjectListRequest request) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_LIST_SUCCESS,
@@ -53,6 +68,10 @@ public class UserProjectController {
   }
 
   @PostMapping(value="/create",consumes = {"multipart/form-data"})
+  @Operation(
+      summary = "Create Project",
+      description = "프로젝트 생성"
+  )
   public ResponseEntity<ResultResponse> createProject(
       @RequestBody @Valid ProjectCreateRequest request)
       throws IOException, NoSuchAlgorithmException {
@@ -61,6 +80,10 @@ public class UserProjectController {
   }
 
   @PatchMapping(value="/update",consumes = {"multipart/form-data"})
+  @Operation(
+      summary = "Update Project",
+      description = "프로젝트 수정"
+  )
   public ResponseEntity<ResultResponse> updateProject(
       @RequestBody @Valid ProjectUpdateRequest request)
       throws IOException, NoSuchAlgorithmException {
@@ -69,9 +92,15 @@ public class UserProjectController {
   }
 
   @DeleteMapping(value="/delete",consumes = {"application/json"})
+  @Operation(
+      summary = "Delete Project",
+      description = "프로젝트 삭제"
+  )
   public ResponseEntity<ResultResponse> deleteProject(
       @RequestBody @Valid ProjectDeleteRequest request) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_DELETE_SUCCESS,
         userProjectService.deleteProject(request)));
   }
 }
+
+

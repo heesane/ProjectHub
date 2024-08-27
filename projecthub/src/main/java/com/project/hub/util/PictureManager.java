@@ -48,7 +48,7 @@ public class PictureManager {
     // erd/1_1.jpg
     String newFileName =
         pictureType.getFolderPrefix() +
-            "/" + userId + "_" + projectName +
+            "/" + userId + "_" + projectName + "." +
             Objects.requireNonNull(multipartFile.getOriginalFilename()).split("\\.")[1];
 
     File uploadFile = convert(multipartFile).orElseThrow(

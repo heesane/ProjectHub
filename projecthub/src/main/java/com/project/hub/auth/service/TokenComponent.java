@@ -1,15 +1,14 @@
 package com.project.hub.auth.service;
 
 import com.project.hub.auth.jwt.dto.JwtToken;
-import com.project.hub.exception.exception.TokenExpiredException;
-import com.project.hub.exception.exception.TokenNotExistsException;
+import com.project.hub.exceptions.exception.TokenExpiredException;
+import com.project.hub.exceptions.exception.TokenNotExistsException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Arrays;
@@ -43,8 +42,6 @@ public class TokenComponent {
   }
 
   public JwtToken generateToken(Long userId) {
-    log.info("generateToken");
-    log.info("userId : {}", userId);
     return JwtToken.builder()
         .accessToken(generateAccessToken(userId))
         .refreshToken(generateRefreshToken())
@@ -52,8 +49,6 @@ public class TokenComponent {
   }
 
   public String generateAccessToken(Long userId) { // 액세스, 리프레시 토큰 생성 로직 구현
-    log.info("generateAccessToken");
-    log.info("userId : {}", userId);
     Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
     return Jwts.builder().setClaims(claims)
         .setIssuedAt(new Date(System.currentTimeMillis()))

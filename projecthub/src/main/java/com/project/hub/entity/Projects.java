@@ -75,14 +75,8 @@ public class Projects extends BaseTimeEntity {
   @Column(name = "system_architecture_url", nullable = true)
   private String systemArchitectureUrl;
 
-  @Column(name = "hash_system_architecture", nullable = true)
-  private String hashSystemArchitecture;
-
   @Column(name = "erd_url", nullable = true)
   private String erdUrl;
-
-  @Column(name = "hash_erd", nullable = true)
-  private String hashErd;
 
   @Column(name = "github_url", nullable = true)
   private String githubUrl;
@@ -96,14 +90,12 @@ public class Projects extends BaseTimeEntity {
   @JsonIgnore
   private User user;
 
-  public void updateSystemArchitecture(String newUrl, String newHash) {
+  public void updateSystemArchitecture(String newUrl) {
     this.systemArchitectureUrl = newUrl;
-    this.hashSystemArchitecture = newHash;
   }
 
-  public void updateErd(String newUrl, String newHash) {
+  public void updateErd(String newUrl) {
     this.erdUrl = newUrl;
-    this.hashErd = newHash;
   }
 
   public void update(String title, String subject, String feature, String contents,

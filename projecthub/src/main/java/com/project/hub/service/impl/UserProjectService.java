@@ -25,7 +25,6 @@ import com.project.hub.service.ProjectService;
 import com.project.hub.util.PictureManager;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -123,11 +122,9 @@ public class UserProjectService implements ProjectService {
   @Override
   @Transactional
   public ResultResponse createProject(ProjectCreateRequest request)
-      throws IOException, NoSuchAlgorithmException {
+      throws IOException {
 
     Long userId = request.getUserId();
-
-    log.info("ProjectCreateRequest: {}", request);
 
     User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
@@ -138,17 +135,12 @@ public class UserProjectService implements ProjectService {
         PictureType.SYSTEM_ARCHITECTURE
     );
 
-    String hashSystemArchitecture = pictureManager.calculateSHA256Base64(
-        request.getSystemArchitecturePicture());
-
     String uploadedErdUrl = pictureManager.upload(
         userId,
         request.getTitle(),
         request.getErdPicture(),
         PictureType.ERD
     );
-
-    String hashErd = pictureManager.calculateSHA256Base64(request.getErdPicture());
 
     Projects project = Projects.builder()
         .title(request.getTitle())
@@ -158,9 +150,7 @@ public class UserProjectService implements ProjectService {
         .skills(request.getSkills())
         .tools(request.getTools())
         .systemArchitectureUrl(uploadedSystemArchitectureUrl)
-        .hashSystemArchitecture(hashSystemArchitecture)
         .erdUrl(uploadedErdUrl)
-        .hashErd(hashErd)
         .githubUrl(request.getGithubUrl())
         .user(user)
         .build();
@@ -173,7 +163,7 @@ public class UserProjectService implements ProjectService {
   @Override
   @Transactional
   public ResultResponse updateProject(ProjectUpdateRequest request)
-      throws IOException, NoSuchAlgorithmException {
+      throws IOException {
 
     Long userId = request.getUserId();
 
@@ -193,34 +183,26 @@ public class UserProjectService implements ProjectService {
       throw new UnmatchedUserException();
     }
 
-    // 사진의 hash 값 비교로 변경 여부 확인
-    if (pictureManager.diff(project.getHashSystemArchitecture(),
-        request.getSystemArchitecturePicture())) {
+    // 업데이트 요청 시 이미지가 있는 경우만 변경
+
+    if (request.getSystemArchitecturePicture() != null) {
       String uploadedSystemArchitectureUrl = pictureManager.upload(
           userId,
           request.getTitle(),
           request.getSystemArchitecturePicture(),
           PictureType.SYSTEM_ARCHITECTURE
       );
-
-      project.updateSystemArchitecture(
-          uploadedSystemArchitectureUrl,
-          pictureManager.calculateSHA256Base64(request.getSystemArchitecturePicture())
-      );
+      project.updateSystemArchitecture(uploadedSystemArchitectureUrl);
     }
 
-    if (pictureManager.diff(project.getHashErd(), request.getErdPicture())) {
+    if (request.getErdPicture() != null) {
       String uploadedErdUrl = pictureManager.upload(
           userId,
           request.getTitle(),
           request.getErdPicture(),
           PictureType.ERD
       );
-
-      project.updateErd(
-          uploadedErdUrl,
-          pictureManager.calculateSHA256Base64(request.getErdPicture())
-      );
+      project.updateErd(uploadedErdUrl);
     }
 
     project.update(

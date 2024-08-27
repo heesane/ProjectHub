@@ -232,9 +232,7 @@ class UserProjectServiceTest {
         .skills(skills1)
         .tools(tools1)
         .systemArchitectureUrl("project1")
-        .hashSystemArchitecture("projectSystemArchitecture1Hash")
         .erdUrl("project1")
-        .hashErd("projectERD1Hash")
         .githubUrl("https://github.com/heesane")
         .visible(true)
         .build();
@@ -248,9 +246,7 @@ class UserProjectServiceTest {
         .skills(skills2)
         .tools(tools2)
         .systemArchitectureUrl("project2")
-        .hashSystemArchitecture("projectSystemArchitecture2Hash")
         .erdUrl("project2")
-        .hashErd("projectERD2Hash")
         .githubUrl("https://github.com/heesane2")
         .visible(false)
         .build();
@@ -264,9 +260,7 @@ class UserProjectServiceTest {
         .skills(skills2)
         .tools(tools2)
         .systemArchitectureUrl("project2")
-        .hashSystemArchitecture("projectSystemArchitecture2Hash")
         .erdUrl("project2")
-        .hashErd("projectERD2Hash")
         .githubUrl("https://github.com/heesane2")
         .visible(false)
         .build();
@@ -362,7 +356,6 @@ class UserProjectServiceTest {
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(successUser));
     when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project1));
     when(pictureManager.upload(anyLong(), any(), any(), any())).thenReturn("systemArchitectureUrl");
-    when(pictureManager.diff(any(), any())).thenReturn(true);
 
     String message = userProjectService.updateProject(successProjectUpdateRequest).getMessage();
 

@@ -4,6 +4,7 @@ import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,9 +28,9 @@ public class ProjectUpdateRequest extends BaseProjectRequest {
       String feature,
       @NotBlank
       String contents,
-      @NotBlank
+      @NotEmpty
       List<Skills> skills,
-      @NotBlank
+      @NotEmpty
       List<Tools> tools,
       MultipartFile systemArchitecturePicture,
       MultipartFile erdPicture,

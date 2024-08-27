@@ -3,6 +3,7 @@ package com.project.hub.model.dto.request.projects;
 import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,10 +25,10 @@ public class BaseProjectRequest {
   @NotBlank
   private final String contents;
 
-  @NotBlank
+  @NotEmpty
   private final List<Skills> skills;
 
-  @NotBlank
+  @NotEmpty
   private final List<Tools> tools;
 
   private final MultipartFile systemArchitecturePicture;

@@ -51,8 +51,9 @@ public class PictureManager {
             "/" + userId + "_" + projectName +
             Objects.requireNonNull(multipartFile.getOriginalFilename()).split("\\.")[1];
 
-    File uploadFile = convert(multipartFile)
-        .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
+    File uploadFile = convert(multipartFile).orElseThrow(
+        () -> new IllegalArgumentException("MultipartFile -> File 전환 실패")
+    );
 
     // 업로드한 사진의 URL 반환
     return upload(newFileName, uploadFile);
@@ -91,11 +92,10 @@ public class PictureManager {
   ) {
 
     if (targetFile.delete()) {
-      log.info("파일이 삭제되었습니다.");
+      log.debug("파일이 삭제되었습니다.");
     } else {
-      log.info("파일이 삭제되지 못했습니다.");
+      log.error("{} 파일이 삭제되지 못했습니다.",targetFile.getName());
     }
-
   }
 
   private Optional<File> convert(
@@ -103,9 +103,6 @@ public class PictureManager {
   ) throws IOException {
 
     String fileOriginalName = file.getOriginalFilename();
-
-    log.info(fileOriginalName);
-
     File convertFile = new File(Objects.requireNonNull(fileOriginalName)); // 업로드한 파일의 이름
 
     if (convertFile.createNewFile()) {

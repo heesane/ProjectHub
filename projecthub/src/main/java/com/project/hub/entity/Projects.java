@@ -18,6 +18,8 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.List;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,6 +30,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
+@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE projects SET deleted_at = now() WHERE id = ?")
 @Table(name = "projects")
 public class Projects extends BaseTimeEntity {
 
@@ -36,19 +40,19 @@ public class Projects extends BaseTimeEntity {
   private Long id;
 
   // 프로젝트 제목
-  @Column(name = "title",nullable = false)
+  @Column(name = "title", nullable = false)
   private String title;
 
   // 프로젝트 주제(요약)
-  @Column(name = "subject",nullable = false)
+  @Column(name = "subject", nullable = false)
   private String subject;
 
   // 프로젝트 기능
-  @Column(name = "feature",nullable = false)
+  @Column(name = "feature", nullable = false)
   @Lob // MarkUp Language를 저장하기 위해 Lob 사용
   private String feature;
 
-  @Column(name = "contents",nullable = false)
+  @Column(name = "contents", nullable = false)
   @Lob // MarkUp Language를 저장하기 위해 Lob 사용
   private String contents;
 
@@ -73,7 +77,7 @@ public class Projects extends BaseTimeEntity {
   @Column(name = "erd_url", nullable = true)
   private String erdUrl;
 
-  @Column(name = "hahs_erd", nullable = true)
+  @Column(name = "hash_erd", nullable = true)
   private String hashErd;
 
   @Column(name = "github_url", nullable = true)
@@ -111,9 +115,5 @@ public class Projects extends BaseTimeEntity {
 
   public void updateVisible(boolean visible) {
     this.visible = visible;
-  }
-
-  public void delete() {
-    super.delete();
   }
 }

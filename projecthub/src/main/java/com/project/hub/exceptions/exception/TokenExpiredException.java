@@ -1,6 +1,6 @@
-package com.project.hub.exception.exception;
+package com.project.hub.exceptions.exception;
 
-import com.project.hub.exception.ExceptionCode;
+import com.project.hub.exceptions.ExceptionCode;
 
 public class TokenExpiredException extends BusinessException {
 

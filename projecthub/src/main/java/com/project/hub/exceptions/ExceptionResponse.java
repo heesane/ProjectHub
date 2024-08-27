@@ -1,4 +1,4 @@
-package com.project.hub.exception;
+package com.project.hub.exceptions;
 
 import java.util.ArrayList;
 import java.util.List;

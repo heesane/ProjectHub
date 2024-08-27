@@ -1,4 +1,4 @@
-package com.project.hub.exception;
+package com.project.hub.exceptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +22,9 @@ public enum ExceptionCode {
   // Project
   PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "P001", "프로젝트를 찾을 수 없음"),
   UNMATCHED_PROJECT_OWNER(HttpStatus.FORBIDDEN.value(), "P002", "프로젝트 소유자가 아님"),
+
+  // Comments
+  COMMENTS_NOT_FOUND(HttpStatus.NOT_FOUND.value(),"C001","댓글을 찾을 수 없음")
   ;
   private final int status;
   private final String code;

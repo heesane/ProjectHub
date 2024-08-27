@@ -21,6 +21,13 @@ public enum ResultCode {
   PROJECT_CREATE_SUCCESS("P001", "프로젝트 생성 성공"),
   PROJECT_UPDATE_SUCCESS("P002", "프로젝트 수정 성공"),
   PROJECT_DELETE_SUCCESS("P003", "프로젝트 삭제 성공"),
+
+  // Comments
+  COMMENT_WRITE_SUCCESS("C001", "댓글 작성 성공"),
+  COMMENT_UPDATE_SUCCESS("C005", "댓글 수정 성공"),
+  COMMENT_DELETE_SUCCESS("C002", "댓글 삭제 성공"),
+  COMMENT_REPLY_SUCCESS("C003", "대댓글 작성 성공"),
+  COMMENT_LIST_SUCCESS("C004", "댓글 리스트 조회 성공"),
   ;
   private final String code;
   private final String message;

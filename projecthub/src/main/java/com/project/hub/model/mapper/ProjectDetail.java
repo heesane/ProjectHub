@@ -1,7 +1,6 @@
 package com.project.hub.model.mapper;
 
 import com.project.hub.entity.Projects;
-import com.project.hub.entity.User;
 import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
 import java.time.LocalDateTime;
@@ -20,7 +19,7 @@ public class ProjectDetail {
   private final String systemArchitectureUrl;
   private final String erdUrl;
   private final String githubUrl;
-  private final User user;
+  private final Long userId;
   private final LocalDateTime registeredAt;
 
   public ProjectDetail(Projects project) {
@@ -33,7 +32,7 @@ public class ProjectDetail {
     this.systemArchitectureUrl = project.getSystemArchitectureUrl();
     this.erdUrl = project.getErdUrl();
     this.githubUrl = project.getGithubUrl();
-    this.user = project.getUser();
+    this.userId = project.getUser().getId();
     this.registeredAt = project.getRegisteredAt();
   }
 }

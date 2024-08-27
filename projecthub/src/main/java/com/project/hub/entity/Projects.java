@@ -1,6 +1,7 @@
 package com.project.hub.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
 import jakarta.persistence.CollectionTable;
@@ -18,12 +19,13 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.List;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @AllArgsConstructor
@@ -59,12 +61,14 @@ public class Projects extends BaseTimeEntity {
   @ElementCollection(targetClass = Skills.class)
   @CollectionTable(name = "project_skills", joinColumns = @JoinColumn(name = "project_id"))
   @Enumerated(EnumType.STRING)
+  @BatchSize(size = 10)
   @Column(name = "skills")
   private List<Skills> skills;
 
   @ElementCollection(targetClass = Tools.class)
   @CollectionTable(name = "project_tools", joinColumns = @JoinColumn(name = "tools_id"))
   @Enumerated(EnumType.STRING)
+  @BatchSize(size = 10)
   @Column(name = "tools")
   private List<Tools> tools;
 
@@ -87,8 +91,9 @@ public class Projects extends BaseTimeEntity {
   private boolean visible;
 
   // 등록한 User
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
+  @JsonIgnore
   private User user;
 
   public void updateSystemArchitecture(String newUrl, String newHash) {

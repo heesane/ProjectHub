@@ -296,7 +296,7 @@ class UserProjectServiceTest {
   void getProjectDetail() {
     // given
     // when
-    when(projectRepository.findByIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.of(project1));
+    when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project1));
     // then
     assertEquals(
         userProjectService.getProjectDetail(successProjectRequest).getProjectDetail().getTitle(),
@@ -360,7 +360,7 @@ class UserProjectServiceTest {
 
     // when
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(successUser));
-    when(projectRepository.findByIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.of(project1));
+    when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project1));
     when(pictureManager.upload(anyLong(), any(), any(), any())).thenReturn("systemArchitectureUrl");
     when(pictureManager.diff(any(), any())).thenReturn(true);
 
@@ -378,7 +378,7 @@ class UserProjectServiceTest {
 
     // when
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(successUser));
-    when(projectRepository.findByIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.of(project1));
+    when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project1));
 
     // then
     assertThrows(UnmatchedUserException.class,
@@ -391,7 +391,7 @@ class UserProjectServiceTest {
     //given
     //when
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(successUser));
-    when(projectRepository.findByIdAndDeletedAtIsNull(anyLong())).thenReturn(Optional.of(project1));
+    when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project1));
 
     ResultResponse resultResponse = userProjectService.deleteProject(successProjectDeleteRequest);
 

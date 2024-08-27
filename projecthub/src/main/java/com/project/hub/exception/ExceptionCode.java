@@ -18,6 +18,10 @@ public enum ExceptionCode {
   DUPLICATE_NICKNAME(HttpStatus.CONFLICT.value(), "A004", "이미 존재하는 닉네임"),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "A005", "사용자를 찾을 수 없음"),
   UNMATCHED_PASSWORD(HttpStatus.BAD_REQUEST.value(), "A006", "비밀번호가 일치하지 않음"),
+
+  // Project
+  PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "P001", "프로젝트를 찾을 수 없음"),
+  UNMATCHED_PROJECT_OWNER(HttpStatus.FORBIDDEN.value(), "P002", "프로젝트 소유자가 아님"),
   ;
   private final int status;
   private final String code;

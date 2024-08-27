@@ -14,9 +14,9 @@ import com.project.hub.entity.User;
 import com.project.hub.exception.exception.DuplicatedEmailException;
 import com.project.hub.exception.exception.UnmatchedPasswordException;
 import com.project.hub.exception.exception.UserNotFoundException;
-import com.project.hub.model.dto.request.UserLoginRequest;
-import com.project.hub.model.dto.request.UserRegisterRequest;
-import com.project.hub.model.dto.response.UserRegisterResponse;
+import com.project.hub.model.dto.request.auth.UserLoginRequest;
+import com.project.hub.model.dto.request.auth.UserRegisterRequest;
+import com.project.hub.model.dto.response.auth.UserRegisterResponse;
 import com.project.hub.repository.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,7 +78,6 @@ class JwtAuthServiceTest {
         .role(USER)
         .build();
 
-
     // 정상 회원가입
     userRegisterRequest = UserRegisterRequest.builder()
         .email("registerTest@gmail.com")
@@ -124,7 +123,7 @@ class JwtAuthServiceTest {
     UserRegisterResponse register = jwtAuthService.register(userRegisterRequest);
 
     //then
-    assertEquals(register.getEmail(),registerUser.getEmail());
+    assertEquals(register.getEmail(), registerUser.getEmail());
   }
 
   @Test
@@ -145,15 +144,16 @@ class JwtAuthServiceTest {
 
     //given
     given(userRepository.findByEmail(anyString())).willReturn(Optional.ofNullable(this.loginUser));
-    given(tokenComponent.generateToken(anyLong())).willReturn(JwtToken.builder().accessToken("accessToken").refreshToken("refreshToken").build());
+    given(tokenComponent.generateToken(anyLong())).willReturn(
+        JwtToken.builder().accessToken("accessToken").refreshToken("refreshToken").build());
 
     // when
     when(encoder.matches(anyString(), anyString())).thenReturn(true);
     JwtToken token = jwtAuthService.login(userLoginRequest);
 
     // then
-    assertEquals(token.accessToken(),"accessToken");
-    assertEquals(token.refreshToken(),"refreshToken");
+    assertEquals(token.accessToken(), "accessToken");
+    assertEquals(token.refreshToken(), "refreshToken");
   }
 
   @Test

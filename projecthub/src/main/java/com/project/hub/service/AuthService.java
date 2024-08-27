@@ -2,9 +2,9 @@ package com.project.hub.service;
 
 import com.project.hub.auth.jwt.dto.JwtToken;
 import com.project.hub.entity.User;
-import com.project.hub.model.dto.request.UserLoginRequest;
-import com.project.hub.model.dto.request.UserRegisterRequest;
-import com.project.hub.model.dto.response.UserRegisterResponse;
+import com.project.hub.model.dto.request.auth.UserLoginRequest;
+import com.project.hub.model.dto.request.auth.UserRegisterRequest;
+import com.project.hub.model.dto.response.auth.UserRegisterResponse;
 
 public interface AuthService {
 

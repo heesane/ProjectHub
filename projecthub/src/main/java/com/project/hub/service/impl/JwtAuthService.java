@@ -7,12 +7,13 @@ import com.project.hub.exception.exception.DuplicatedEmailException;
 import com.project.hub.exception.exception.DuplicatedNicknameException;
 import com.project.hub.exception.exception.UnmatchedPasswordException;
 import com.project.hub.exception.exception.UserNotFoundException;
-import com.project.hub.model.dto.request.UserLoginRequest;
-import com.project.hub.model.dto.request.UserRegisterRequest;
-import com.project.hub.model.dto.response.UserRegisterResponse;
+import com.project.hub.model.dto.request.auth.UserLoginRequest;
+import com.project.hub.model.dto.request.auth.UserRegisterRequest;
+import com.project.hub.model.dto.response.auth.UserRegisterResponse;
 import com.project.hub.model.type.UserRole;
 import com.project.hub.repository.UserRepository;
 import com.project.hub.service.AuthService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +28,7 @@ public class JwtAuthService implements AuthService {
   private final BCryptPasswordEncoder encoder;
   private final TokenComponent tokenComponent;
 
+  @Transactional
   @Override
   public UserRegisterResponse register(UserRegisterRequest userRegisterDto) {
 

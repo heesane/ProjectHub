@@ -4,6 +4,7 @@ package com.project.hub.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -17,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -89,6 +91,11 @@ public class Projects extends BaseTimeEntity {
   @JoinColumn(name = "user_id")
   @JsonIgnore
   private User user;
+
+  // 댓글 및 대댓글
+  @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
+  private List<Comments> comments;
 
   public void updateSystemArchitecture(String newUrl) {
     this.systemArchitectureUrl = newUrl;

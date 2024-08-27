@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
-import com.project.hub.exception.exception.ProjectNotFoundException;
-import com.project.hub.exception.exception.UnmatchedUserException;
+import com.project.hub.exceptions.exception.NotFoundException;
+import com.project.hub.exceptions.exception.UnmatchedUserException;
 import com.project.hub.model.dto.request.projects.MyProjectListRequest;
 import com.project.hub.model.dto.request.projects.ProjectCreateRequest;
 import com.project.hub.model.dto.request.projects.ProjectDeleteRequest;
@@ -25,6 +25,8 @@ import com.project.hub.model.type.Tools;
 import com.project.hub.repository.ProjectRepository;
 import com.project.hub.repository.UserRepository;
 import com.project.hub.util.PictureManager;
+import com.project.hub.validator.ProjectValidator;
+import com.project.hub.validator.UserValidator;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -52,6 +54,12 @@ class UserProjectServiceTest {
 
   @Mock
   private PictureManager pictureManager;
+
+  @Mock
+  private ProjectValidator projectValidator;
+
+  @Mock
+  private UserValidator userValidator;
 
   @InjectMocks
   private UserProjectService userProjectService;
@@ -303,7 +311,7 @@ class UserProjectServiceTest {
     // given
     // when
     // then
-    assertThrows(ProjectNotFoundException.class,
+    assertThrows(NotFoundException.class,
         () -> userProjectService.getProjectDetail(failProjectRequest));
   }
 
@@ -365,7 +373,7 @@ class UserProjectServiceTest {
 
   @Test
   @DisplayName("프로젝트 업데이트 실패 - 사용자 불일치")
-  void updateProjectFail() throws IOException, NoSuchAlgorithmException {
+  void updateProjectFail() {
 
     // given
 

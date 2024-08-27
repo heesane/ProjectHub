@@ -53,4 +53,5 @@
   * 댓글 혹은 좋아요 요청 시, 사용자의 댓글과 좋아요의 합계를 통해서 배지를 부여
 
 # ERD
-![image](https://github.com/user-attachments/assets/63b0a74c-65ff-485a-83b0-a2fe61108ada)
+![image](https://github.com/user-attachments/assets/da061cde-a944-494a-a95e-92de49bc0253)
+

@@ -24,7 +24,6 @@ import com.project.hub.repository.UserRepository;
 import com.project.hub.service.ProjectService;
 import com.project.hub.util.PictureManager;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -79,7 +78,7 @@ public class UserProjectService implements ProjectService {
   @Override
   public ProjectDetailResponse getProjectDetail(ProjectRequest request) {
 
-    Projects project = projectRepository.findByIdAndDeletedAtIsNull(request.getId()).orElseThrow(
+    Projects project = projectRepository.findById(request.getId()).orElseThrow(
         ProjectNotFoundException::new
     );
 
@@ -128,7 +127,7 @@ public class UserProjectService implements ProjectService {
 
     Long userId = request.getUserId();
 
-    log.info("ProjectCreateRequest: {}",request);
+    log.info("ProjectCreateRequest: {}", request);
 
     User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
@@ -185,7 +184,7 @@ public class UserProjectService implements ProjectService {
 
     Long projectId = request.getProjectId();
 
-    Projects project = projectRepository.findByIdAndDeletedAtIsNull(projectId).orElseThrow(
+    Projects project = projectRepository.findById(projectId).orElseThrow(
         ProjectNotFoundException::new
     );
 
@@ -251,7 +250,7 @@ public class UserProjectService implements ProjectService {
 
     Long projectId = request.getProjectId();
 
-    Projects project = projectRepository.findByIdAndDeletedAtIsNull(projectId).orElseThrow(
+    Projects project = projectRepository.findById(projectId).orElseThrow(
         ProjectNotFoundException::new
     );
 
@@ -265,7 +264,7 @@ public class UserProjectService implements ProjectService {
     // 2. 삭제된 프로젝트 하위 댓글들 모두 soft delete
 
     // soft delete
-    project.delete();
+    projectRepository.delete(project);
 
     return ResultResponse.of(ResultCode.PROJECT_DELETE_SUCCESS);
   }

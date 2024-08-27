@@ -1,7 +1,6 @@
 package com.project.hub.repository;
 
 import com.project.hub.entity.Projects;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,7 +19,4 @@ public interface ProjectRepository extends JpaRepository<Projects, Long> {
   // 댓글 순(추후 댓글 구현시)
 
   // 좋아요 순(추후 좋아요 구현시)
-
-  // 해당 프로젝트의 상세 정보 조회
-  Optional<Projects> findByIdAndDeletedAtIsNull(Long Id);
 }

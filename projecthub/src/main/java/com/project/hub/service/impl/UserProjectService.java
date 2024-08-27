@@ -2,9 +2,9 @@ package com.project.hub.service.impl;
 
 import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
-import com.project.hub.exception.exception.ProjectNotFoundException;
-import com.project.hub.exception.exception.UnmatchedUserException;
-import com.project.hub.exception.exception.UserNotFoundException;
+import com.project.hub.exceptions.ExceptionCode;
+import com.project.hub.exceptions.exception.NotFoundException;
+import com.project.hub.exceptions.exception.UnmatchedUserException;
 import com.project.hub.model.dto.request.projects.MyProjectListRequest;
 import com.project.hub.model.dto.request.projects.ProjectCreateRequest;
 import com.project.hub.model.dto.request.projects.ProjectDeleteRequest;
@@ -20,9 +20,10 @@ import com.project.hub.model.type.PictureType;
 import com.project.hub.model.type.ResultCode;
 import com.project.hub.model.type.Sorts;
 import com.project.hub.repository.ProjectRepository;
-import com.project.hub.repository.UserRepository;
 import com.project.hub.service.ProjectService;
 import com.project.hub.util.PictureManager;
+import com.project.hub.validator.ProjectValidator;
+import com.project.hub.validator.UserValidator;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
@@ -42,8 +43,9 @@ import org.springframework.validation.annotation.Validated;
 public class UserProjectService implements ProjectService {
 
   private final ProjectRepository projectRepository;
-  private final UserRepository userRepository;
   private final PictureManager pictureManager;
+  private final UserValidator userValidator;
+  private final ProjectValidator projectValidator;
 
   @Override
   public ListProjectResponse listProjects(ProjectListRequest request) {
@@ -77,9 +79,7 @@ public class UserProjectService implements ProjectService {
   @Override
   public ProjectDetailResponse getProjectDetail(ProjectRequest request) {
 
-    Projects project = projectRepository.findById(request.getId()).orElseThrow(
-        ProjectNotFoundException::new
-    );
+    Projects project = projectValidator.validateAndGetProject(request.getId());
 
     return new ProjectDetailResponse(new ProjectDetail(project));
   }
@@ -87,10 +87,7 @@ public class UserProjectService implements ProjectService {
   @Override
   public ListProjectResponse getMyProjectDetail(MyProjectListRequest request) {
 
-    Long userId = request.getUserId();
-
-    // 존재 여부만 파악
-    User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    userValidator.isUserExist(request.getUserId());
 
     Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
 
@@ -126,7 +123,7 @@ public class UserProjectService implements ProjectService {
 
     Long userId = request.getUserId();
 
-    User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    User user = userValidator.validateAndGetUser(userId);
 
     String uploadedSystemArchitectureUrl = pictureManager.upload(
         userId,
@@ -167,16 +164,11 @@ public class UserProjectService implements ProjectService {
 
     Long userId = request.getUserId();
 
-    // 존재 여부만 파악
-    User user = userRepository.findById(userId).orElseThrow(
-        UserNotFoundException::new
-    );
+    userValidator.isUserExist(userId);
 
     Long projectId = request.getProjectId();
 
-    Projects project = projectRepository.findById(projectId).orElseThrow(
-        ProjectNotFoundException::new
-    );
+    Projects project = projectValidator.validateAndGetProject(projectId);
 
     // 사용자가 등록한 프로젝트가 아닌 경우
     if (!project.getUser().getId().equals(userId)) {
@@ -225,15 +217,12 @@ public class UserProjectService implements ProjectService {
 
     Long userId = request.getUserId();
 
-    // 존재 여부만 파악
-    User user = userRepository.findById(userId).orElseThrow(
-        UserNotFoundException::new
-    );
+    userValidator.isUserExist(userId);
 
     Long projectId = request.getProjectId();
 
     Projects project = projectRepository.findById(projectId).orElseThrow(
-        ProjectNotFoundException::new
+        () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)
     );
 
     // 사용자가 등록한 프로젝트가 아닌 경우

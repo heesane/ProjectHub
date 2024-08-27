@@ -11,9 +11,9 @@ import static org.mockito.Mockito.when;
 import com.project.hub.auth.jwt.dto.JwtToken;
 import com.project.hub.auth.service.TokenComponent;
 import com.project.hub.entity.User;
-import com.project.hub.exception.exception.DuplicatedEmailException;
-import com.project.hub.exception.exception.UnmatchedPasswordException;
-import com.project.hub.exception.exception.UserNotFoundException;
+import com.project.hub.exceptions.exception.DuplicatedEmailException;
+import com.project.hub.exceptions.exception.NotFoundException;
+import com.project.hub.exceptions.exception.UnmatchedPasswordException;
 import com.project.hub.model.dto.request.auth.UserLoginRequest;
 import com.project.hub.model.dto.request.auth.UserRegisterRequest;
 import com.project.hub.model.dto.response.auth.UserRegisterResponse;
@@ -175,7 +175,7 @@ class JwtAuthServiceTest {
     given(userRepository.findByEmail(anyString())).willReturn(Optional.empty());
 
     //when&then
-    assertThrows(UserNotFoundException.class, () -> {
+    assertThrows(NotFoundException.class, () -> {
       jwtAuthService.login(invalidEmailUserLoginRequest);
     });
   }

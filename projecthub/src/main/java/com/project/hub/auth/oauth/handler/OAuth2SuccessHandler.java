@@ -2,7 +2,8 @@ package com.project.hub.auth.oauth.handler;
 
 import com.project.hub.auth.service.TokenComponent;
 import com.project.hub.entity.User;
-import com.project.hub.exception.exception.UserNotFoundException;
+import com.project.hub.exceptions.ExceptionCode;
+import com.project.hub.exceptions.exception.NotFoundException;
 import com.project.hub.model.type.UserRole;
 import com.project.hub.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String email = oAuth2User.getAttribute("email");
 
     User user = userRepository.findByEmail(email).orElseThrow(
-        UserNotFoundException::new
+        () -> new NotFoundException(ExceptionCode.USER_NOT_FOUND)
     );
     Long userId;
 

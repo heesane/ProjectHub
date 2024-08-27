@@ -3,10 +3,11 @@ package com.project.hub.service.impl;
 import com.project.hub.auth.jwt.dto.JwtToken;
 import com.project.hub.auth.service.TokenComponent;
 import com.project.hub.entity.User;
-import com.project.hub.exception.exception.DuplicatedEmailException;
-import com.project.hub.exception.exception.DuplicatedNicknameException;
-import com.project.hub.exception.exception.UnmatchedPasswordException;
-import com.project.hub.exception.exception.UserNotFoundException;
+import com.project.hub.exceptions.ExceptionCode;
+import com.project.hub.exceptions.exception.DuplicatedEmailException;
+import com.project.hub.exceptions.exception.DuplicatedNicknameException;
+import com.project.hub.exceptions.exception.NotFoundException;
+import com.project.hub.exceptions.exception.UnmatchedPasswordException;
 import com.project.hub.model.dto.request.auth.UserLoginRequest;
 import com.project.hub.model.dto.request.auth.UserRegisterRequest;
 import com.project.hub.model.dto.response.auth.UserRegisterResponse;
@@ -58,7 +59,7 @@ public class JwtAuthService implements AuthService {
     String password = userLoginDto.getPassword();
 
     User user = userRepository.findByEmail(email).orElseThrow(
-        UserNotFoundException::new
+        () -> new NotFoundException(ExceptionCode.USER_NOT_FOUND)
     );
 
     if (!encoder.matches(password, user.getPassword())) {
@@ -71,7 +72,7 @@ public class JwtAuthService implements AuthService {
   @Override
   public User getUser(Long userId) {
     return userRepository.findById(userId).orElseThrow(
-        UserNotFoundException::new
+        () -> new NotFoundException(ExceptionCode.USER_NOT_FOUND)
     );
   }
 }

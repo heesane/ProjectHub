@@ -1,6 +1,7 @@
 package com.project.hub.model.mapper;
 
 import com.project.hub.entity.Projects;
+import com.project.hub.model.dto.response.comments.CommentsList;
 import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class ProjectDetail {
   private final String githubUrl;
   private final Long userId;
   private final LocalDateTime registeredAt;
+  private final CommentsList comments;
 
   public ProjectDetail(Projects project) {
     this.title = project.getTitle();
@@ -34,5 +36,6 @@ public class ProjectDetail {
     this.githubUrl = project.getGithubUrl();
     this.userId = project.getUser().getId();
     this.registeredAt = project.getRegisteredAt();
+    this.comments = new CommentsList(project.getComments());
   }
 }

@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -58,8 +59,8 @@ public class UserProjectService implements ProjectService {
     Page<Projects> sortedProjects;
 
     if (sort == Sorts.LATEST) {
-      sortedProjects = projectRepository.findAllByDeletedAtIsNullOrderByRegisteredAtDesc(
-          pageable);
+      pageable.getSort().and(Sort.by(Sort.Direction.DESC, "registeredAt"));
+      sortedProjects = projectRepository.findAll(pageable);
 
       List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
           .collect(Collectors.toList());
@@ -89,7 +90,8 @@ public class UserProjectService implements ProjectService {
 
     userValidator.isUserExist(request.getUserId());
 
-    Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+    Pageable pageable;
+
 
     Sorts sort = request.getSort();
 
@@ -97,7 +99,8 @@ public class UserProjectService implements ProjectService {
     Page<Projects> sortedProjects;
 
     if (sort == Sorts.LATEST) {
-      sortedProjects = projectRepository.findAllByUserIdAndDeletedAtIsNullOrderByRegisteredAtDesc(
+      pageable = PageRequest.of(request.getPage(), request.getSize(), Sort.by(Sort.Direction.DESC, "registeredAt"));
+      sortedProjects = projectRepository.findAllByUserId(
           request.getUserId(),
           pageable);
 
@@ -177,7 +180,7 @@ public class UserProjectService implements ProjectService {
 
     // 업데이트 요청 시 이미지가 있는 경우만 변경
 
-    if (request.getSystemArchitecturePicture() != null) {
+    if (request.getSystemArchitecturePicture() != null && !request.getSystemArchitecturePicture().isEmpty()) {
       String uploadedSystemArchitectureUrl = pictureManager.upload(
           userId,
           request.getTitle(),
@@ -185,6 +188,9 @@ public class UserProjectService implements ProjectService {
           PictureType.SYSTEM_ARCHITECTURE
       );
       project.updateSystemArchitecture(uploadedSystemArchitectureUrl);
+    }
+    else{
+      log.info("System Architecture Picture is null");
     }
 
     if (request.getErdPicture() != null) {
@@ -195,6 +201,9 @@ public class UserProjectService implements ProjectService {
           PictureType.ERD
       );
       project.updateErd(uploadedErdUrl);
+    }
+    else{
+      log.info("ERD Picture is null");
     }
 
     project.update(

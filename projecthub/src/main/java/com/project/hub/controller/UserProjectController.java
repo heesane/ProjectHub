@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -45,9 +44,11 @@ public class UserProjectController {
       summary = "Get Projects",
       description = "프로젝트 리스트 조회"
   )
-  public ResponseEntity<ResultResponse> getProjects(@RequestParam ProjectListRequest request) {
+  public ResponseEntity<ResultResponse> getProjects(
+      @ModelAttribute ProjectListRequest projectListRequest) {
     return ResponseEntity.ok(
-        ResultResponse.of(PROJECT_LIST_SUCCESS, userProjectService.listProjects(request)));
+        ResultResponse.of(PROJECT_LIST_SUCCESS,
+            userProjectService.listProjects(projectListRequest)));
   }
 
   @GetMapping(value = "/{projectId}")
@@ -67,7 +68,7 @@ public class UserProjectController {
       description = "내 프로젝트 리스트 조회"
   )
   public ResponseEntity<ResultResponse> getMyProjects(
-      @RequestParam @Valid MyProjectListRequest request) {
+      @ModelAttribute @Valid MyProjectListRequest request) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_LIST_SUCCESS,
         userProjectService.getMyProjectDetail(request)));
   }
@@ -79,7 +80,7 @@ public class UserProjectController {
   )
   public ResponseEntity<ResultResponse> createProject(
       @ModelAttribute @Valid ProjectCreateRequest request)
-      throws IOException, NoSuchAlgorithmException {
+      throws IOException {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_CREATE_SUCCESS,
         userProjectService.createProject(request)));
   }
@@ -90,8 +91,8 @@ public class UserProjectController {
       description = "프로젝트 수정"
   )
   public ResponseEntity<ResultResponse> updateProject(
-      @RequestBody @Valid ProjectUpdateRequest request)
-      throws IOException, NoSuchAlgorithmException {
+      @ModelAttribute @Valid ProjectUpdateRequest request)
+      throws IOException {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_UPDATE_SUCCESS,
         userProjectService.updateProject(request)));
   }

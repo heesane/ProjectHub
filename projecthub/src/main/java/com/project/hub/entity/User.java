@@ -58,6 +58,5 @@ public class User extends BaseTimeEntity {
 
   // 유저가 등록한 프로젝트의 리스트
   @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-  @JsonIgnore
   private List<Projects> projects;
 }

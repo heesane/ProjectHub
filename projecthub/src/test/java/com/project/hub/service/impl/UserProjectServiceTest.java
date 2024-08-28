@@ -41,6 +41,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -283,8 +284,7 @@ class UserProjectServiceTest {
     List<Projects> projects = List.of(project1, project2);
     Page<Projects> projectPage = new PageImpl<>(projects); // PageImpl을 사용하여 Page 객체 생성
     // when
-    when(projectRepository.findAllByDeletedAtIsNullOrderByRegisteredAtDesc(any()))
-        .thenReturn(projectPage);
+    when(projectRepository.findAll((Pageable) any())).thenReturn(projectPage);
     // then
     assertEquals(
         userProjectService.listProjects(successProjectListRequest).getProjectDetails().size(), 2);
@@ -325,7 +325,7 @@ class UserProjectServiceTest {
     Page<Projects> projectPage = new PageImpl<>(projects); // PageImpl을 사용하여 Page 객체 생성
     // when
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(successUser));
-    when(projectRepository.findAllByUserIdAndDeletedAtIsNullOrderByRegisteredAtDesc(any(), any()))
+    when(projectRepository.findAllByUserId(any(), any()))
         .thenReturn(projectPage);
     // then
     assertEquals(

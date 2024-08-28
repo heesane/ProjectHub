@@ -89,7 +89,6 @@ public class Projects extends BaseTimeEntity {
   // 등록한 User
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
-  @JsonIgnore
   private User user;
 
   // 댓글 및 대댓글

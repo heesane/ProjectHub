@@ -15,7 +15,7 @@ public class ProjectValidator {
 
   public Projects validateAndGetProject(Long projectId) {
     // 프로젝트 정보 검증
-    return projectRepository.findById(projectId).orElseThrow(
+    return projectRepository.findByIdWithDetail(projectId).orElseThrow(
         () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND));
   }
 

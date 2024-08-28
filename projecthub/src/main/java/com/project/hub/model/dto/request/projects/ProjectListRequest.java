@@ -1,14 +1,20 @@
 package com.project.hub.model.dto.request.projects;
 
 import com.project.hub.model.type.Sorts;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
-@AllArgsConstructor
+@ToString
 public class ProjectListRequest {
 
-  private int page = 0;
-  private int size = 5;
-  private Sorts sort = Sorts.LATEST;
+  private final int page;
+  private final int size;
+  private final Sorts sort;
+
+  public ProjectListRequest(Integer page, Integer size, Sorts sort) {
+    this.page = page;
+    this.size = (size != 0) ? size : 10;
+    this.sort = (sort != null) ? sort : Sorts.LATEST;
+  }
 }

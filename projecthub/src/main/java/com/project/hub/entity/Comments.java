@@ -53,6 +53,9 @@ public class Comments extends BaseTimeEntity {
   @JsonIgnore
   private Comments parentComment;
 
+  @Column(name = "likes")
+  private Long likes;
+
   @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   @JsonIgnore
   private List<Comments> replies;
@@ -63,5 +66,9 @@ public class Comments extends BaseTimeEntity {
 
   public void update(UpdateCommentRequest updateComment) {
     this.contents = updateComment.getContents();
+  }
+
+  public void updateLikes(Long likes) {
+    this.likes = likes;
   }
 }

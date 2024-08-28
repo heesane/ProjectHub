@@ -96,6 +96,12 @@ public class Projects extends BaseTimeEntity {
   @JsonIgnore
   private List<Comments> comments;
 
+  @Column(name = "like_counts")
+  private Long likeCounts;
+
+  @Column(name="comment_counts")
+  private Long commentCounts;
+
   public void updateSystemArchitecture(String newUrl) {
     this.systemArchitectureUrl = newUrl;
   }
@@ -118,5 +124,13 @@ public class Projects extends BaseTimeEntity {
 
   public void updateVisible(boolean visible) {
     this.visible = visible;
+  }
+
+  public void updateLikeCounts(long likeCounts) {
+    this.likeCounts = likeCounts;
+  }
+
+  public void updateCommentCounts() {
+    this.commentCounts += 1;
   }
 }

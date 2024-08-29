@@ -5,7 +5,7 @@ import com.project.hub.entity.User;
 import com.project.hub.exceptions.ExceptionCode;
 import com.project.hub.exceptions.exception.NotFoundException;
 import com.project.hub.model.type.UserRole;
-import com.project.hub.repository.UserRepository;
+import com.project.hub.repository.jpa.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

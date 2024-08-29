@@ -17,7 +17,7 @@ import com.project.hub.exceptions.exception.UnmatchedPasswordException;
 import com.project.hub.model.dto.request.auth.UserLoginRequest;
 import com.project.hub.model.dto.request.auth.UserRegisterRequest;
 import com.project.hub.model.dto.response.auth.UserRegisterResponse;
-import com.project.hub.repository.UserRepository;
+import com.project.hub.repository.jpa.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

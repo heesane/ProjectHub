@@ -5,6 +5,7 @@ import com.project.hub.entity.User;
 import com.project.hub.exceptions.ExceptionCode;
 import com.project.hub.exceptions.exception.NotFoundException;
 import com.project.hub.exceptions.exception.UnmatchedUserException;
+import com.project.hub.model.documents.ProjectDocuments;
 import com.project.hub.model.dto.request.projects.MyProjectListRequest;
 import com.project.hub.model.dto.request.projects.ProjectCreateRequest;
 import com.project.hub.model.dto.request.projects.ProjectDeleteRequest;
@@ -12,6 +13,7 @@ import com.project.hub.model.dto.request.projects.ProjectListRequest;
 import com.project.hub.model.dto.request.projects.ProjectRequest;
 import com.project.hub.model.dto.request.projects.ProjectUpdateRequest;
 import com.project.hub.model.dto.response.ResultResponse;
+import com.project.hub.model.dto.response.comments.Comment;
 import com.project.hub.model.dto.response.projects.ListProjectResponse;
 import com.project.hub.model.dto.response.projects.ProjectDetailResponse;
 import com.project.hub.model.mapper.ProjectDetail;
@@ -19,7 +21,8 @@ import com.project.hub.model.mapper.ShortProjectDetail;
 import com.project.hub.model.type.PictureType;
 import com.project.hub.model.type.ResultCode;
 import com.project.hub.model.type.Sorts;
-import com.project.hub.repository.ProjectRepository;
+import com.project.hub.repository.document.ProjectDocumentsRepository;
+import com.project.hub.repository.jpa.ProjectRepository;
 import com.project.hub.service.ProjectService;
 import com.project.hub.util.PictureManager;
 import com.project.hub.validator.ProjectValidator;
@@ -44,6 +47,7 @@ import org.springframework.validation.annotation.Validated;
 public class UserProjectService implements ProjectService {
 
   private final ProjectRepository projectRepository;
+  private final ProjectDocumentsRepository projectDocumentsRepository;
   private final PictureManager pictureManager;
   private final UserValidator userValidator;
   private final ProjectValidator projectValidator;
@@ -92,14 +96,14 @@ public class UserProjectService implements ProjectService {
 
     Pageable pageable;
 
-
     Sorts sort = request.getSort();
 
     // 추후 개발을 위해 우선 선언
     Page<Projects> sortedProjects;
 
     if (sort == Sorts.LATEST) {
-      pageable = PageRequest.of(request.getPage(), request.getSize(), Sort.by(Sort.Direction.DESC, "registeredAt"));
+      pageable = PageRequest.of(request.getPage(), request.getSize(),
+          Sort.by(Sort.Direction.DESC, "registeredAt"));
       sortedProjects = projectRepository.findAllByUserId(
           request.getUserId(),
           pageable);
@@ -157,6 +161,9 @@ public class UserProjectService implements ProjectService {
 
     projectRepository.save(project);
 
+    // Elasticsearch에 저장
+    createProjectElasticsearch(project);
+
     return ResultResponse.of(ResultCode.PROJECT_CREATE_SUCCESS);
   }
 
@@ -180,7 +187,8 @@ public class UserProjectService implements ProjectService {
 
     // 업데이트 요청 시 이미지가 있는 경우만 변경
 
-    if (request.getSystemArchitecturePicture() != null && !request.getSystemArchitecturePicture().isEmpty()) {
+    if (request.getSystemArchitecturePicture() != null && !request.getSystemArchitecturePicture()
+        .isEmpty()) {
       String uploadedSystemArchitectureUrl = pictureManager.upload(
           userId,
           request.getTitle(),
@@ -188,8 +196,7 @@ public class UserProjectService implements ProjectService {
           PictureType.SYSTEM_ARCHITECTURE
       );
       project.updateSystemArchitecture(uploadedSystemArchitectureUrl);
-    }
-    else{
+    } else {
       log.info("System Architecture Picture is null");
     }
 
@@ -201,8 +208,7 @@ public class UserProjectService implements ProjectService {
           PictureType.ERD
       );
       project.updateErd(uploadedErdUrl);
-    }
-    else{
+    } else {
       log.info("ERD Picture is null");
     }
 
@@ -248,4 +254,28 @@ public class UserProjectService implements ProjectService {
 
     return ResultResponse.of(ResultCode.PROJECT_DELETE_SUCCESS);
   }
+
+  @Transactional
+  public void createProjectElasticsearch(Projects project) {
+    ProjectDocuments newProjectDocuments = ProjectDocuments.builder().
+        id(project.getId()).
+        title(project.getTitle()).
+        subject(project.getSubject()).
+        feature(project.getFeature()).
+        contents(project.getContents()).
+        skills(project.getSkills().stream().map(Enum::name).collect(Collectors.toList())).
+        tools(project.getTools().stream().map(Enum::name).collect(Collectors.toList())).
+        systemArchitecture(project.getSystemArchitectureUrl()).
+        erd(project.getErdUrl()).
+        githubLink(project.getGithubUrl()).
+        authorName(project.getUser().getNickname()).
+        comments(
+            project.getComments() != null ? project.getComments().stream().map(Comment::of).toList()
+                : null).
+        commentsCount(project.getCommentCounts()).
+        likeCount(project.getLikeCounts()).
+        build();
+    projectDocumentsRepository.save(newProjectDocuments);
+  }
 }
+

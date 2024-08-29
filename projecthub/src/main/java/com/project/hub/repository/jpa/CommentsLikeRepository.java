@@ -1,4 +1,4 @@
-package com.project.hub.repository;
+package com.project.hub.repository.jpa;
 
 import com.project.hub.entity.CommentLikes;
 import org.springframework.data.jpa.repository.JpaRepository;

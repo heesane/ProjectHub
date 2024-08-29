@@ -30,6 +30,7 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

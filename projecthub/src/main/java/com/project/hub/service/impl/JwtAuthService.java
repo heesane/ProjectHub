@@ -12,7 +12,7 @@ import com.project.hub.model.dto.request.auth.UserLoginRequest;
 import com.project.hub.model.dto.request.auth.UserRegisterRequest;
 import com.project.hub.model.dto.response.auth.UserRegisterResponse;
 import com.project.hub.model.type.UserRole;
-import com.project.hub.repository.UserRepository;
+import com.project.hub.repository.jpa.UserRepository;
 import com.project.hub.service.AuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

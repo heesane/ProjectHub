@@ -34,6 +34,9 @@ public enum ResultCode {
   PROJECT_LIKE_SUCCESS("L002", "프로젝트 좋아요 성공"),
   COMMENT_DISLIKE_SUCCESS("L003", "댓글 좋아요 취소 성공"),
   COMMENT_LIKE_SUCCESS("L004", "댓글 좋아요 성공"),
+
+  // Search
+  SEARCH_SUCCESS("S001", "검색 성공"),
   ;
   private final String code;
   private final String message;

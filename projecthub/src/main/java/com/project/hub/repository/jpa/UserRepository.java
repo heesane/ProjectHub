@@ -1,4 +1,4 @@
-package com.project.hub.repository;
+package com.project.hub.repository.jpa;
 
 import com.project.hub.entity.User;
 import java.util.Optional;

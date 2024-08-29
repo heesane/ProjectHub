@@ -1,7 +1,7 @@
 package com.project.hub.validator;
 
 import com.project.hub.entity.Comments;
-import com.project.hub.repository.CommentsRepository;
+import com.project.hub.repository.jpa.CommentsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

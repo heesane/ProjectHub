@@ -29,6 +29,7 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -99,7 +100,7 @@ public class Projects extends BaseTimeEntity {
   @Column(name = "like_counts")
   private Long likeCounts;
 
-  @Column(name="comment_counts")
+  @Column(name = "comment_counts")
   private Long commentCounts;
 
   public void updateSystemArchitecture(String newUrl) {

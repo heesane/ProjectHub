@@ -11,6 +11,7 @@ import com.project.hub.model.type.ResultCode;
 import com.project.hub.repository.CommentsRepository;
 import com.project.hub.repository.ProjectRepository;
 import com.project.hub.service.CommentsService;
+import com.project.hub.util.UpdateManager;
 import com.project.hub.validator.CommentValidator;
 import com.project.hub.validator.ProjectValidator;
 import com.project.hub.validator.UserValidator;
@@ -54,8 +55,8 @@ public class UserCommentsService implements CommentsService {
           .parentComment(parentComment)
           .build();
 
+      UpdateManager.incrementProjectCommentCount(commentedProject);
 
-      commentedProject.updateCommentCounts();
       parentComment.reply(newComments);
 
       commentsRepository.save(newComments);
@@ -70,7 +71,7 @@ public class UserCommentsService implements CommentsService {
           .contents(request.getContents())
           .build();
 
-      commentedProject.updateCommentCounts();
+      UpdateManager.incrementProjectCommentCount(commentedProject);
 
       commentsRepository.save(newComments);
       projectRepository.save(commentedProject);

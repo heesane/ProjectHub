@@ -2,6 +2,7 @@ package com.project.hub.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.hub.aop.lock.DistributedLockInterface;
 import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
 import jakarta.persistence.CascadeType;
@@ -29,6 +30,7 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,7 +39,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE projects SET deleted_at = now() WHERE id = ?")
 @Table(name = "projects")
-public class Projects extends BaseTimeEntity {
+public class Projects extends BaseTimeEntity implements DistributedLockInterface {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -96,6 +98,12 @@ public class Projects extends BaseTimeEntity {
   @JsonIgnore
   private List<Comments> comments;
 
+  @Column(name = "like_counts")
+  private Long likeCounts;
+
+  @Column(name = "comment_counts")
+  private Long commentCounts;
+
   public void updateSystemArchitecture(String newUrl) {
     this.systemArchitectureUrl = newUrl;
   }
@@ -118,5 +126,18 @@ public class Projects extends BaseTimeEntity {
 
   public void updateVisible(boolean visible) {
     this.visible = visible;
+  }
+
+  public void updateLikeCounts(long likeCounts) {
+    this.likeCounts = likeCounts;
+  }
+
+  public void incrementCommentCounts() {
+    this.commentCounts += 1;
+  }
+
+  @Override
+  public String getEntityType() {
+    return "Projects";
   }
 }

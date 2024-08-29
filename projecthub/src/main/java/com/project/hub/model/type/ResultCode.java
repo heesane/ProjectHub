@@ -28,6 +28,15 @@ public enum ResultCode {
   COMMENT_DELETE_SUCCESS("C002", "댓글 삭제 성공"),
   COMMENT_REPLY_SUCCESS("C003", "대댓글 작성 성공"),
   COMMENT_LIST_SUCCESS("C004", "댓글 리스트 조회 성공"),
+
+  // Likes
+  PROJECT_DISLIKE_SUCCESS("L001", "프로젝트 좋아요 취소 성공"),
+  PROJECT_LIKE_SUCCESS("L002", "프로젝트 좋아요 성공"),
+  COMMENT_DISLIKE_SUCCESS("L003", "댓글 좋아요 취소 성공"),
+  COMMENT_LIKE_SUCCESS("L004", "댓글 좋아요 성공"),
+
+  // Search
+  SEARCH_SUCCESS("S001", "검색 성공"),
   ;
   private final String code;
   private final String message;

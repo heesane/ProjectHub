@@ -8,8 +8,10 @@ import com.project.hub.model.dto.request.comments.UpdateCommentRequest;
 import com.project.hub.model.dto.request.comments.WriteCommentRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.type.ResultCode;
-import com.project.hub.repository.CommentsRepository;
+import com.project.hub.repository.jpa.CommentsRepository;
+import com.project.hub.repository.jpa.ProjectRepository;
 import com.project.hub.service.CommentsService;
+import com.project.hub.util.UpdateManager;
 import com.project.hub.validator.CommentValidator;
 import com.project.hub.validator.ProjectValidator;
 import com.project.hub.validator.UserValidator;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class UserCommentsService implements CommentsService {
 
   private final CommentsRepository commentsRepository;
+  private final ProjectRepository projectRepository;
   private final UserValidator userValidator;
   private final ProjectValidator projectValidator;
   private final CommentValidator commentValidator;
@@ -52,10 +55,12 @@ public class UserCommentsService implements CommentsService {
           .parentComment(parentComment)
           .build();
 
-      commentsRepository.save(newComments);
+      UpdateManager.incrementProjectCommentCount(commentedProject);
 
       parentComment.reply(newComments);
 
+      commentsRepository.save(newComments);
+      projectRepository.save(commentedProject);
       return ResultResponse.of(ResultCode.COMMENT_REPLY_SUCCESS, newComments.getId());
     }
     // 댓글인 경우
@@ -66,7 +71,10 @@ public class UserCommentsService implements CommentsService {
           .contents(request.getContents())
           .build();
 
+      UpdateManager.incrementProjectCommentCount(commentedProject);
+
       commentsRepository.save(newComments);
+      projectRepository.save(commentedProject);
       return ResultResponse.of(ResultCode.COMMENT_WRITE_SUCCESS, newComments.getId());
     }
   }

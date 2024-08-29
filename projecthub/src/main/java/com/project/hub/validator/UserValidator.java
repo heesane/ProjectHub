@@ -3,7 +3,7 @@ package com.project.hub.validator;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.ExceptionCode;
 import com.project.hub.exceptions.exception.NotFoundException;
-import com.project.hub.repository.UserRepository;
+import com.project.hub.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

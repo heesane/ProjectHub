@@ -1,5 +1,6 @@
 package com.project.hub.entity;
 
+import com.project.hub.aop.lock.DistributedLockInterface;
 import com.project.hub.model.dto.request.comments.UpdateCommentRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -28,7 +29,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @Table(name = "comments")
 @SQLRestriction("deleted_at IS NULL")
-public class Comments extends BaseTimeEntity {
+public class Comments extends BaseTimeEntity implements DistributedLockInterface {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,6 +54,9 @@ public class Comments extends BaseTimeEntity {
   @JsonIgnore
   private Comments parentComment;
 
+  @Column(name = "likes")
+  private Long likes;
+
   @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   @JsonIgnore
   private List<Comments> replies;
@@ -63,5 +67,14 @@ public class Comments extends BaseTimeEntity {
 
   public void update(UpdateCommentRequest updateComment) {
     this.contents = updateComment.getContents();
+  }
+
+  public void updateLikes(Long likes) {
+    this.likes = likes;
+  }
+
+  @Override
+  public String getEntityType() {
+    return "Comments";
   }
 }

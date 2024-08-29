@@ -23,6 +23,8 @@ public class ProjectDetail {
   private final Long userId;
   private final LocalDateTime registeredAt;
   private final CommentsList comments;
+  private final Long likes;
+  private final Long commentCounts;
 
   public ProjectDetail(Projects project) {
     this.title = project.getTitle();
@@ -37,5 +39,8 @@ public class ProjectDetail {
     this.userId = project.getUser().getId();
     this.registeredAt = project.getRegisteredAt();
     this.comments = new CommentsList(project.getComments());
+    this.likes = project.getLikeCounts();
+    this.commentCounts = (long)project.getComments().size();
+
   }
 }

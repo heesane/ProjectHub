@@ -57,6 +57,9 @@ dependencies {
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Redisson
+    implementation 'org.redisson:redisson:3.17.1'
 }
 
 tasks.named('test') {

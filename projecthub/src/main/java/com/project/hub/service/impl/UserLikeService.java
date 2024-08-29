@@ -17,6 +17,7 @@ import com.project.hub.repository.jpa.CommentsRepository;
 import com.project.hub.repository.jpa.ProjectRepository;
 import com.project.hub.repository.jpa.ProjectsLikeRepository;
 import com.project.hub.service.LikeService;
+import com.project.hub.util.UpdateManager;
 import jakarta.transaction.Transactional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -133,7 +134,9 @@ public class UserLikeService implements LikeService {
       Projects project = projectsRepository.findById(likeTargetId).orElseThrow(
           () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)
       );
-      project.updateLikeCounts(likeCount);
+
+      UpdateManager.updateProjectLikeCount(project, likeCount);
+
       getLikeUser(fullKey).forEach(
           userId -> updateProjectLikeTable(likeTargetId, Long.parseLong(userId)));
       // 업데이트 된 Project Entity 저장
@@ -142,7 +145,8 @@ public class UserLikeService implements LikeService {
       Comments comments = commentsRepository.findById(likeTargetId).orElseThrow(
           () -> new NotFoundException(ExceptionCode.COMMENTS_NOT_FOUND)
       );
-      comments.updateLikes(likeCount);
+      UpdateManager.updateCommentLikeCount(comments,likeCount);
+
       getLikeUser(fullKey).forEach(
           userId -> updateCommentLikeTable(likeTargetId, Long.parseLong(userId)));
       // 업데이트 된 Comment Entity 저장

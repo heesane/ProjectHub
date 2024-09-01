@@ -28,6 +28,10 @@ public enum ExceptionCode {
 
   // Project Documents
   PROJECT_DOCUMENTS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "PD001", "프로젝트 문서를 찾을 수 없음"),
+
+  // Badge
+  BADGE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "B001", "뱃지를 찾을 수 없음"),
+  BADGE_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "B002", "이미 존재하는 뱃지"),
   ;
   private final int status;
   private final String code;

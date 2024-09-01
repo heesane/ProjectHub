@@ -19,16 +19,11 @@ import com.project.hub.repository.jpa.ProjectsLikeRepository;
 import com.project.hub.service.LikeService;
 import com.project.hub.util.UpdateManager;
 import jakarta.transaction.Transactional;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.DataType;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.KeyScanOptions;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -107,15 +102,12 @@ public class UserLikeService implements LikeService {
     String pattern = likeType == LikeType.PROJECT ? LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + "*"
         : LIKE_KEY_PREFIX + COMMENT_LIKE_KEY + "*";
 
-    ScanOptions options = KeyScanOptions.scanOptions(DataType.SET).match(pattern).count(10).build();
-
-    try (Cursor<byte[]> cursor = Objects.requireNonNull(redisTemplate.getConnectionFactory())
-        .getConnection().scan(options)) {
-      while (cursor.hasNext()) {
-        updateLikeCount(new String(cursor.next(), StandardCharsets.UTF_8));
-      }
-    } catch (Exception e) {
-      log.error("Error during scanning Redis keys", e);
+    // key scan 개선
+    // scan 방식에서 Project id를 추출하여 해당 Project Entity를 조회하고 좋아요 수를 업데이트
+    List<Long> targetsId = likeType == LikeType.PROJECT ? projectsRepository.findAllIdWithDetail() : commentsRepository.findAllIdWithDetail();
+    for (Long targetId : targetsId) {
+      String key = LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + targetId;
+      updateLikeCount(key);
     }
   }
 

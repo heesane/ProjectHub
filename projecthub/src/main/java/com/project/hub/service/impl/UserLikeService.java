@@ -104,19 +104,15 @@ public class UserLikeService implements LikeService {
     List<Long> targetsId = likeType == LikeType.PROJECT ? projectsRepository.findAllIdWithDetail() : commentsRepository.findAllIdWithDetail();
     for (Long targetId : targetsId) {
       String key = LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + targetId;
-      updateLikeCount(key);
+      updateLikeCount(key,targetId);
     }
   }
 
   @Transactional
-  public void updateLikeCount(String fullKey) {
+  public void updateLikeCount(String fullKey,Long targetId) {
     // Key에 따른 LikeType 설정
     // like:project:1 -> LikeType.PROJECT, like:comment:1 -> LikeType.COMMENT
     LikeType likeType = fullKey.contains(PROJECT_LIKE_KEY) ? LikeType.PROJECT : LikeType.COMMENT;
-
-    // 전체 Key에서 ProjectId 추출
-    // like:project:1 -> 1, like:comment:1 -> 1
-    Long likeTargetId = Long.parseLong(fullKey.split(":")[2]);
 
     // Redis에서 해당 키 값의 member 수 조회
     // like:project:1 -> ProjectId 1의 좋아요 수
@@ -124,24 +120,24 @@ public class UserLikeService implements LikeService {
 
     // 프로젝트 엔티티 조회 후 좋아요 수 업데이트
     if (likeType == LikeType.PROJECT) {
-      Projects project = projectsRepository.findById(likeTargetId).orElseThrow(
+      Projects project = projectsRepository.findById(targetId).orElseThrow(
           () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)
       );
 
       UpdateManager.updateProjectLikeCount(project, likeCount);
 
       getLikeUser(fullKey).forEach(
-          userId -> updateProjectLikeTable(likeTargetId, Long.parseLong(userId)));
+          userId -> updateProjectLikeTable(targetId, Long.parseLong(userId)));
       // 업데이트 된 Project Entity 저장
       projectsRepository.saveAndFlush(project);
     } else {
-      Comments comments = commentsRepository.findById(likeTargetId).orElseThrow(
+      Comments comments = commentsRepository.findById(targetId).orElseThrow(
           () -> new NotFoundException(ExceptionCode.COMMENTS_NOT_FOUND)
       );
       UpdateManager.updateCommentLikeCount(comments, likeCount);
 
       getLikeUser(fullKey).forEach(
-          userId -> updateCommentLikeTable(likeTargetId, Long.parseLong(userId)));
+          userId -> updateCommentLikeTable(targetId, Long.parseLong(userId)));
       // 업데이트 된 Comment Entity 저장
       commentsRepository.saveAndFlush(comments);
     }
@@ -149,27 +145,19 @@ public class UserLikeService implements LikeService {
 
   @Transactional
   public void updateProjectLikeTable(Long projectId, Long userId) {
-    // redis에 이미 좋아요가 기록되어 있고, DB에도 이미 좋아요가 기록되어 있을 경우
-    if (projectsLikeRepository.existsByProjectIdAndUserId(projectId, userId)) {
-      log.debug("User {} already liked project {}", userId, projectId);
-
-    }
     // redis에 좋아요가 기록되어 있지만, DB에는 좋아요가 기록되어 있지 않을 경우
-    else {
+    if (!projectsLikeRepository.existsByProjectIdAndUserId(projectId, userId)) {
       ProjectLikes newProjectLike = ProjectLikes.builder()
           .projectId(projectId)
           .userId(userId)
           .build();
       projectsLikeRepository.saveAndFlush(newProjectLike);
     }
-
   }
 
   @Transactional
   public void updateCommentLikeTable(Long commentId, Long userId) {
-    if (commentsLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
-      log.debug("User {} already liked comment {}", userId, commentId);
-    } else {
+    if (!commentsLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
       CommentLikes newCommentLike = CommentLikes.builder()
           .commentId(commentId)
           .userId(userId)
@@ -179,7 +167,10 @@ public class UserLikeService implements LikeService {
   }
 
   private Long getLikeCount(String key) {
-    return redisTemplate.opsForSet().size(key);
+    if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
+      return redisTemplate.opsForSet().size(key);
+    }
+    return 0L;
   }
 
   private Set<String> getLikeUser(String key) {

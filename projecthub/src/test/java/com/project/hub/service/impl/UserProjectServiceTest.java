@@ -25,8 +25,7 @@ import com.project.hub.model.type.Tools;
 import com.project.hub.repository.jpa.ProjectRepository;
 import com.project.hub.repository.jpa.UserRepository;
 import com.project.hub.util.PictureManager;
-import com.project.hub.validator.ProjectValidator;
-import com.project.hub.validator.UserValidator;
+import com.project.hub.validator.Validator;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -57,10 +56,7 @@ class UserProjectServiceTest {
   private PictureManager pictureManager;
 
   @Mock
-  private ProjectValidator projectValidator;
-
-  @Mock
-  private UserValidator userValidator;
+  private Validator validator;
 
   @InjectMocks
   private UserProjectService userProjectService;

@@ -1,5 +1,6 @@
 package com.project.hub.model.documents;
 
+import com.project.hub.aop.lock.DistributedLockInterface;
 import com.project.hub.entity.Projects;
 import com.project.hub.model.dto.response.comments.Comment;
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @NoArgsConstructor
 @Getter
 @Builder
-public class ProjectDocuments {
+public class ProjectDocuments implements DistributedLockInterface {
 
   @Id
   @Field(name = "id", type = FieldType.Keyword)
@@ -83,7 +84,12 @@ public class ProjectDocuments {
     this.githubLink = projects.getGithubUrl();
     this.authorName = projects.getUser().getNickname();
     this.comments = projects.getComments() != null ? projects.getComments().stream().map(Comment::of).toList() : null;
-    this.commentsCount = projects.getCommentCounts();
+    this.commentsCount = projects.getComments() != null ? (long)projects.getComments().size() : 0L;
     this.likeCount = projects.getLikeCounts();
+  }
+
+  @Override
+  public String getEntityType() {
+    return "projects";
   }
 }

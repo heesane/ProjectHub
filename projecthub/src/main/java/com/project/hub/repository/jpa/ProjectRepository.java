@@ -28,4 +28,7 @@ public interface ProjectRepository extends JpaRepository<Projects, Long> {
   Optional<Projects> findByTitle(String title);
 
   List<Projects> findAllByTitleLike(String title);
+
+  @Query("select p.id from Projects p")
+  List<Long> findAllIdWithDetail();
 }

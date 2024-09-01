@@ -1,6 +1,7 @@
 package com.project.hub.repository.jpa;
 
 import com.project.hub.entity.Projects;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,4 +25,7 @@ public interface ProjectRepository extends JpaRepository<Projects, Long> {
   @Query("select p from Projects p JOIN fetch p.user where p.id = :projectId")
   Optional<Projects> findByIdWithDetail(@Param("projectId") Long projectId);
 
+  Optional<Projects> findByTitle(String title);
+
+  List<Projects> findAllByTitleLike(String title);
 }

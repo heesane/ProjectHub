@@ -61,10 +61,6 @@ public class Comments extends BaseTimeEntity implements DistributedLockInterface
   @JsonIgnore
   private List<Comments> replies;
 
-  public void reply(Comments reply) {
-    this.replies.add(reply);
-  }
-
   public void update(UpdateCommentRequest updateComment) {
     this.contents = updateComment.getContents();
   }

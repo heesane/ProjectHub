@@ -92,8 +92,9 @@ public class UserLikeService implements LikeService {
   }
 
 
-  @Scheduled(cron = "0 0 * * * *")
+  @Scheduled(cron = "0 * * * * *")
   public void saveLikeCount() {
+    log.info("Updating like counts");
     updateLikes(LikeType.PROJECT);
     updateLikes(LikeType.COMMENT);
   }

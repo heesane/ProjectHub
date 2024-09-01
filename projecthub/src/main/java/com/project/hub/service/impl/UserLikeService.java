@@ -99,9 +99,6 @@ public class UserLikeService implements LikeService {
   @Transactional
   public void updateLikes(LikeType likeType) {
 
-    String pattern = likeType == LikeType.PROJECT ? LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + "*"
-        : LIKE_KEY_PREFIX + COMMENT_LIKE_KEY + "*";
-
     // key scan 개선
     // scan 방식에서 Project id를 추출하여 해당 Project Entity를 조회하고 좋아요 수를 업데이트
     List<Long> targetsId = likeType == LikeType.PROJECT ? projectsRepository.findAllIdWithDetail() : commentsRepository.findAllIdWithDetail();

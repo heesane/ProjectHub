@@ -25,8 +25,7 @@ import com.project.hub.repository.document.ProjectDocumentsRepository;
 import com.project.hub.repository.jpa.ProjectRepository;
 import com.project.hub.service.ProjectService;
 import com.project.hub.util.PictureManager;
-import com.project.hub.validator.ProjectValidator;
-import com.project.hub.validator.UserValidator;
+import com.project.hub.validator.Validator;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
@@ -49,8 +48,7 @@ public class UserProjectService implements ProjectService {
   private final ProjectRepository projectRepository;
   private final ProjectDocumentsRepository projectDocumentsRepository;
   private final PictureManager pictureManager;
-  private final UserValidator userValidator;
-  private final ProjectValidator projectValidator;
+  private final Validator validator;
 
   @Override
   public ListProjectResponse listProjects(ProjectListRequest request) {
@@ -84,7 +82,7 @@ public class UserProjectService implements ProjectService {
   @Override
   public ProjectDetailResponse getProjectDetail(ProjectRequest request) {
 
-    Projects project = projectValidator.validateAndGetProject(request.getId());
+    Projects project = validator.validateAndGetProject(request.getId());
 
     return new ProjectDetailResponse(new ProjectDetail(project));
   }
@@ -92,7 +90,7 @@ public class UserProjectService implements ProjectService {
   @Override
   public ListProjectResponse getMyProjectDetail(MyProjectListRequest request) {
 
-    userValidator.isUserExist(request.getUserId());
+    validator.isUserExist(request.getUserId());
 
     Pageable pageable;
 
@@ -130,7 +128,7 @@ public class UserProjectService implements ProjectService {
 
     Long userId = request.getUserId();
 
-    User user = userValidator.validateAndGetUser(userId);
+    User user = validator.validateAndGetUser(userId);
 
     String uploadedSystemArchitectureUrl = pictureManager.upload(
         userId,
@@ -174,11 +172,11 @@ public class UserProjectService implements ProjectService {
 
     Long userId = request.getUserId();
 
-    userValidator.isUserExist(userId);
+    validator.isUserExist(userId);
 
     Long projectId = request.getProjectId();
 
-    Projects project = projectValidator.validateAndGetProject(projectId);
+    Projects project = validator.validateAndGetProject(projectId);
 
     // 사용자가 등록한 프로젝트가 아닌 경우
     if (!project.getUser().getId().equals(userId)) {
@@ -186,7 +184,6 @@ public class UserProjectService implements ProjectService {
     }
 
     // 업데이트 요청 시 이미지가 있는 경우만 변경
-
     if (request.getSystemArchitecturePicture() != null && !request.getSystemArchitecturePicture()
         .isEmpty()) {
       String uploadedSystemArchitectureUrl = pictureManager.upload(
@@ -196,8 +193,6 @@ public class UserProjectService implements ProjectService {
           PictureType.SYSTEM_ARCHITECTURE
       );
       project.updateSystemArchitecture(uploadedSystemArchitectureUrl);
-    } else {
-      log.info("System Architecture Picture is null");
     }
 
     if (request.getErdPicture() != null) {
@@ -208,21 +203,12 @@ public class UserProjectService implements ProjectService {
           PictureType.ERD
       );
       project.updateErd(uploadedErdUrl);
-    } else {
-      log.info("ERD Picture is null");
     }
 
-    project.update(
-        request.getTitle(),
-        request.getSubject(),
-        request.getFeature(),
-        request.getContents(),
-        request.getSkills(),
-        request.getTools(),
-        request.getGithubUrl(),
-        request.isVisible()
-    );
+    project.update(request);
+
     updateProjectsElasticsearch(project);
+
     return ResultResponse.of(ResultCode.PROJECT_UPDATE_SUCCESS);
   }
 
@@ -232,7 +218,7 @@ public class UserProjectService implements ProjectService {
 
     Long userId = request.getUserId();
 
-    userValidator.isUserExist(userId);
+    validator.isUserExist(userId);
 
     Long projectId = request.getProjectId();
 
@@ -249,9 +235,10 @@ public class UserProjectService implements ProjectService {
     // 1. 댓글 및 좋아요 기능 CascadeType.ALL로 처리하여 자동 삭제
     // 2. 삭제된 프로젝트 하위 댓글들 모두 soft delete
 
-    // soft delete
     projectRepository.delete(project);
+
     projectDocumentsRepository.deleteById(projectId);
+
     return ResultResponse.of(ResultCode.PROJECT_DELETE_SUCCESS);
   }
 
@@ -272,17 +259,18 @@ public class UserProjectService implements ProjectService {
         comments(
             project.getComments() != null ? project.getComments().stream().map(Comment::of).toList()
                 : null).
-        commentsCount(project.getCommentCounts()).
+        commentsCount(project.getComments() != null ? (long) project.getComments().size() : 0L).
         likeCount(project.getLikeCounts()).
         build();
     projectDocumentsRepository.save(newProjectDocuments);
   }
 
   @Transactional
-  public void updateProjectsElasticsearch(Projects projects){
-    ProjectDocuments projectDocuments = projectDocumentsRepository.findById(projects.getId()).orElseThrow(
-        () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)
-    );
+  public void updateProjectsElasticsearch(Projects projects) {
+    ProjectDocuments projectDocuments = projectDocumentsRepository.findById(projects.getId())
+        .orElseThrow(
+            () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)
+        );
     projectDocuments.update(projects);
     projectDocumentsRepository.save(projectDocuments);
   }

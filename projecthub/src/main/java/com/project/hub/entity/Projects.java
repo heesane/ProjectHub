@@ -3,6 +3,7 @@ package com.project.hub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.hub.aop.lock.DistributedLockInterface;
+import com.project.hub.model.dto.request.projects.ProjectUpdateRequest;
 import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
 import jakarta.persistence.CascadeType;
@@ -101,9 +102,6 @@ public class Projects extends BaseTimeEntity implements DistributedLockInterface
   @Column(name = "like_counts")
   private Long likeCounts;
 
-  @Column(name = "comment_counts")
-  private Long commentCounts;
-
   public void updateSystemArchitecture(String newUrl) {
     this.systemArchitectureUrl = newUrl;
   }
@@ -112,16 +110,15 @@ public class Projects extends BaseTimeEntity implements DistributedLockInterface
     this.erdUrl = newUrl;
   }
 
-  public void update(String title, String subject, String feature, String contents,
-      List<Skills> skills, List<Tools> tools, String githubUrl, boolean visible) {
-    this.title = title;
-    this.subject = subject;
-    this.feature = feature;
-    this.contents = contents;
-    this.skills = skills;
-    this.tools = tools;
-    this.githubUrl = githubUrl;
-    this.visible = visible;
+  public void update(ProjectUpdateRequest request) {
+    this.title = request.getTitle();
+    this.subject = request.getSubject();
+    this.feature = request.getFeature();
+    this.contents = request.getContents();
+    this.skills = request.getSkills();
+    this.tools = request.getTools();
+    this.githubUrl = request.getGithubUrl();
+    this.visible = request.isVisible();
   }
 
   public void updateVisible(boolean visible) {
@@ -130,10 +127,6 @@ public class Projects extends BaseTimeEntity implements DistributedLockInterface
 
   public void updateLikeCounts(long likeCounts) {
     this.likeCounts = likeCounts;
-  }
-
-  public void incrementCommentCounts() {
-    this.commentCounts += 1;
   }
 
   @Override

@@ -1,16 +1,23 @@
 package com.project.hub.model.documents;
 
+import com.project.hub.entity.Projects;
 import com.project.hub.model.dto.response.comments.Comment;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+@SQLDelete(sql = "UPDATE projects SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @Document(indexName = "projects")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -60,4 +67,23 @@ public class ProjectDocuments {
 
   @Field(name = "likeCount", type = FieldType.Keyword)
   private Long likeCount;
+
+  @Field(name = "deleted_at", type = FieldType.Keyword)
+  private LocalDateTime deletedAt;
+
+  public void update(Projects projects){
+    this.title = projects.getTitle();
+    this.subject = projects.getSubject();
+    this.feature = projects.getFeature();
+    this.contents = projects.getContents();
+    this.skills = projects.getSkills().stream().map(Enum::name).collect(Collectors.toList());
+    this.tools = projects.getTools().stream().map(Enum::name).collect(Collectors.toList());
+    this.systemArchitecture = projects.getSystemArchitectureUrl();
+    this.erd = projects.getErdUrl();
+    this.githubLink = projects.getGithubUrl();
+    this.authorName = projects.getUser().getNickname();
+    this.comments = projects.getComments() != null ? projects.getComments().stream().map(Comment::of).toList() : null;
+    this.commentsCount = projects.getCommentCounts();
+    this.likeCount = projects.getLikeCounts();
+  }
 }

@@ -19,6 +19,8 @@ import com.project.hub.repository.jpa.ProjectsLikeRepository;
 import com.project.hub.service.LikeService;
 import com.project.hub.util.UpdateManager;
 import jakarta.transaction.Transactional;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,12 +94,14 @@ public class UserLikeService implements LikeService {
   }
 
 
-  @Scheduled(cron = "0 0 * * * *")
+  @Scheduled(cron = "0 0/10 * * * *")
+  @Transactional
   public void saveLikeCount() {
     updateLikes(LikeType.PROJECT);
     updateLikes(LikeType.COMMENT);
   }
 
+  @Transactional
   public void updateLikes(LikeType likeType) {
 
     String pattern = likeType == LikeType.PROJECT ? LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + "*"
@@ -105,8 +109,11 @@ public class UserLikeService implements LikeService {
 
     ScanOptions options = KeyScanOptions.scanOptions(DataType.SET).match(pattern).count(10).build();
 
-    try (Cursor<String> cursor = redisTemplate.opsForSet().scan(pattern, options)) {
-      cursor.forEachRemaining(this::updateLikeCount);
+    try (Cursor<byte[]> cursor = Objects.requireNonNull(redisTemplate.getConnectionFactory())
+        .getConnection().scan(options)) {
+      while (cursor.hasNext()) {
+        updateLikeCount(new String(cursor.next(), StandardCharsets.UTF_8));
+      }
     } catch (Exception e) {
       log.error("Error during scanning Redis keys", e);
     }
@@ -114,9 +121,6 @@ public class UserLikeService implements LikeService {
 
   @Transactional
   public void updateLikeCount(String fullKey) {
-
-    // fullKey = like:project:1 or like:comment:1
-
     // Key에 따른 LikeType 설정
     // like:project:1 -> LikeType.PROJECT, like:comment:1 -> LikeType.COMMENT
     LikeType likeType = fullKey.contains(PROJECT_LIKE_KEY) ? LikeType.PROJECT : LikeType.COMMENT;
@@ -140,17 +144,17 @@ public class UserLikeService implements LikeService {
       getLikeUser(fullKey).forEach(
           userId -> updateProjectLikeTable(likeTargetId, Long.parseLong(userId)));
       // 업데이트 된 Project Entity 저장
-      projectsRepository.save(project);
+      projectsRepository.saveAndFlush(project);
     } else {
       Comments comments = commentsRepository.findById(likeTargetId).orElseThrow(
           () -> new NotFoundException(ExceptionCode.COMMENTS_NOT_FOUND)
       );
-      UpdateManager.updateCommentLikeCount(comments,likeCount);
+      UpdateManager.updateCommentLikeCount(comments, likeCount);
 
       getLikeUser(fullKey).forEach(
           userId -> updateCommentLikeTable(likeTargetId, Long.parseLong(userId)));
       // 업데이트 된 Comment Entity 저장
-      commentsRepository.save(comments);
+      commentsRepository.saveAndFlush(comments);
     }
   }
 
@@ -167,7 +171,7 @@ public class UserLikeService implements LikeService {
           .projectId(projectId)
           .userId(userId)
           .build();
-      projectsLikeRepository.save(newProjectLike);
+      projectsLikeRepository.saveAndFlush(newProjectLike);
     }
 
   }
@@ -176,13 +180,12 @@ public class UserLikeService implements LikeService {
   public void updateCommentLikeTable(Long commentId, Long userId) {
     if (commentsLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
       log.debug("User {} already liked comment {}", userId, commentId);
-
     } else {
       CommentLikes newCommentLike = CommentLikes.builder()
           .commentId(commentId)
           .userId(userId)
           .build();
-      commentsLikeRepository.save(newCommentLike);
+      commentsLikeRepository.saveAndFlush(newCommentLike);
     }
   }
 

@@ -64,7 +64,7 @@ dependencies {
 
     // Redisson
     implementation 'org.redisson:redisson:3.17.1'
-
+    implementation 'io.netty:netty-resolver-dns-native-macos'
 }
 
 tasks.named('test') {

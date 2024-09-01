@@ -222,7 +222,7 @@ public class UserProjectService implements ProjectService {
         request.getGithubUrl(),
         request.isVisible()
     );
-
+    updateProjectsElasticsearch(project);
     return ResultResponse.of(ResultCode.PROJECT_UPDATE_SUCCESS);
   }
 
@@ -251,7 +251,7 @@ public class UserProjectService implements ProjectService {
 
     // soft delete
     projectRepository.delete(project);
-
+    projectDocumentsRepository.deleteById(projectId);
     return ResultResponse.of(ResultCode.PROJECT_DELETE_SUCCESS);
   }
 
@@ -276,6 +276,15 @@ public class UserProjectService implements ProjectService {
         likeCount(project.getLikeCounts()).
         build();
     projectDocumentsRepository.save(newProjectDocuments);
+  }
+
+  @Transactional
+  public void updateProjectsElasticsearch(Projects projects){
+    ProjectDocuments projectDocuments = projectDocumentsRepository.findById(projects.getId()).orElseThrow(
+        () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)
+    );
+    projectDocuments.update(projects);
+    projectDocumentsRepository.save(projectDocuments);
   }
 }
 

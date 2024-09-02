@@ -1,0 +1,65 @@
+package com.project.hub.aop.badge;
+
+import com.project.hub.entity.Badge;
+import com.project.hub.entity.User;
+import com.project.hub.exceptions.ExceptionCode;
+import com.project.hub.exceptions.exception.NotFoundException;
+import com.project.hub.repository.jpa.BadgeRepository;
+import com.project.hub.repository.jpa.CommentsLikeRepository;
+import com.project.hub.repository.jpa.UserRepository;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Aspect
+@Component
+@RequiredArgsConstructor
+public class BadgeAspect {
+
+  private final UserRepository userRepository;
+  private final BadgeRepository badgeRepository;
+  private final CommentsLikeRepository commentsLikeRepository;
+
+  @Around("@annotation(badgeCheck) && args(badgeInterface)")
+  public Object around(
+      ProceedingJoinPoint pjp,
+      BadgeCheck badgeCheck,
+      BadgeInterface badgeInterface
+  ) {
+    try {
+      Long userId = badgeInterface.getId();
+
+      Long userProjectCount = (long) badgeInterface.getProjects().size();
+      Long userCommentCount = commentsLikeRepository.countByUserId(userId);
+
+      List<Badge> badgeList = badgeRepository.findAll();
+
+      Badge userBadge = null;
+
+      for (Badge badge : badgeList) {
+        Long requiredProjectCount = badge.getRequiredProjectCount();
+        Long requiredCommentCount = badge.getRequiredCommentCount();
+
+        if (userProjectCount >= requiredProjectCount && userCommentCount >= requiredCommentCount) {
+          userBadge = badge;
+        }
+      }
+      User badgeUser = userRepository.findById(userId).orElseThrow(
+          () -> new NotFoundException(ExceptionCode.USER_NOT_FOUND)
+      );
+
+      if(userBadge != null && badgeUser.getBadge() != userBadge) {
+        badgeUser.updateBadge(userBadge);
+      }
+      return pjp.proceed();
+    } catch (Throwable e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+}

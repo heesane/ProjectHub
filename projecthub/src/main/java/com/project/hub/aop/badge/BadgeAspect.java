@@ -33,7 +33,11 @@ public class BadgeAspect {
     try {
       Long userId = badgeInterface.getId();
 
-      Long userProjectCount = (long) badgeInterface.getProjects().size();
+      User badgeUser = userRepository.findById(userId).orElseThrow(
+          () -> new NotFoundException(ExceptionCode.USER_NOT_FOUND)
+      );
+
+      Long userProjectCount = (long) badgeUser.getProjects().size();
       Long userCommentCount = commentsLikeRepository.countByUserId(userId);
 
       List<Badge> badgeList = badgeRepository.findAll();
@@ -48,9 +52,6 @@ public class BadgeAspect {
           userBadge = badge;
         }
       }
-      User badgeUser = userRepository.findById(userId).orElseThrow(
-          () -> new NotFoundException(ExceptionCode.USER_NOT_FOUND)
-      );
 
       if(userBadge != null && badgeUser.getBadge() != userBadge) {
         badgeUser.updateBadge(userBadge);

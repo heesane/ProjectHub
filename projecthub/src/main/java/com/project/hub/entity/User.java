@@ -1,5 +1,6 @@
 package com.project.hub.entity;
 
+import com.project.hub.aop.badge.BadgeInterface;
 import com.project.hub.model.type.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,7 +31,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE member SET deleted_at = now() WHERE id = ?")
 @Table(name = "member")
-public class User extends BaseTimeEntity {
+public class User extends BaseTimeEntity implements BadgeInterface {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,4 +65,8 @@ public class User extends BaseTimeEntity {
   @OneToOne
   @JoinColumn(name="badge_id")
   private Badge badge;
+
+  public void updateBadge(Badge badge){
+    this.badge = badge;
+  }
 }

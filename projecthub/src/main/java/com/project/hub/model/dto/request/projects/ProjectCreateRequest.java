@@ -1,5 +1,6 @@
 package com.project.hub.model.dto.request.projects;
 
+import com.project.hub.aop.badge.BadgeInterface;
 import com.project.hub.model.type.Skills;
 import com.project.hub.model.type.Tools;
 import jakarta.validation.constraints.Min;
@@ -8,7 +9,7 @@ import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
-public class ProjectCreateRequest extends BaseProjectRequest {
+public class ProjectCreateRequest extends BaseProjectRequest implements BadgeInterface {
 
   private final Long userId;
 
@@ -39,5 +40,10 @@ public class ProjectCreateRequest extends BaseProjectRequest {
     super(title, subject, feature, contents, skills, tools, systemArchitecturePicture, erdPicture,
         githubUrl, visible);
     this.userId = userId;
+  }
+
+  @Override
+  public Long getId() {
+    return this.userId;
   }
 }

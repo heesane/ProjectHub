@@ -31,7 +31,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE member SET deleted_at = now() WHERE id = ?")
 @Table(name = "member")
-public class User extends BaseTimeEntity implements BadgeInterface {
+public class User extends BaseTimeEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

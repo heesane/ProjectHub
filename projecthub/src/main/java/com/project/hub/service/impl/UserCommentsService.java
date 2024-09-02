@@ -1,5 +1,6 @@
 package com.project.hub.service.impl;
 
+import com.project.hub.aop.badge.BadgeCheck;
 import com.project.hub.entity.Comments;
 import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
@@ -30,6 +31,7 @@ public class UserCommentsService implements CommentsService {
   private final ProjectDocumentsRepository projectDocumentsRepository;
   private final Validator validator;
 
+  @BadgeCheck
   @Override
   public ResultResponse createComment(WriteCommentRequest request) {
 

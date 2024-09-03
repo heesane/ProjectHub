@@ -13,7 +13,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Aspect
 @Component
@@ -31,6 +30,10 @@ public class BadgeAspect {
       BadgeInterface badgeInterface
   ) {
     try {
+
+      // 먼저 Annotation이 붙은 메서드 실행 후 처리
+      Object proceed = pjp.proceed();
+
       Long userId = badgeInterface.getId();
 
       User badgeUser = userRepository.findById(userId).orElseThrow(
@@ -56,7 +59,8 @@ public class BadgeAspect {
       if(userBadge != null && badgeUser.getBadge() != userBadge) {
         badgeUser.updateBadge(userBadge);
       }
-      return pjp.proceed();
+      userRepository.saveAndFlush(badgeUser);
+      return proceed;
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }

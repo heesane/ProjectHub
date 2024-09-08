@@ -37,6 +37,12 @@ public enum ResultCode {
 
   // Search
   SEARCH_SUCCESS("S001", "검색 성공"),
+
+  // Badge
+  BADGE_LIST_SUCCESS("B001", "뱃지 리스트 조회 성공"),
+  BADGE_CREATE_SUCCESS("B002", "뱃지 생성 성공"),
+  BADGE_UPDATE_SUCCESS("B003", "뱃지 수정 성공"),
+  BADGE_DELETE_SUCCESS("B004", "뱃지 삭제 성공"),
   ;
   private final String code;
   private final String message;

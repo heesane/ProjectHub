@@ -1,5 +1,6 @@
 package com.project.hub.service.impl;
 
+import com.project.hub.aop.badge.BadgeCheck;
 import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.ExceptionCode;
@@ -121,6 +122,7 @@ public class UserProjectService implements ProjectService {
     return null;
   }
 
+  @BadgeCheck
   @Override
   @Transactional
   public ResultResponse createProject(ProjectCreateRequest request)

@@ -14,6 +14,7 @@ public enum ResultCode {
   USER_DETAIL_INFO_SUCCESS("U003",200, "유저 정보 조회 성공"),
   USER_UPDATE_SUCCESS("U004",200, "유저 정보 수정 성공"),
   USER_PROFILE_SUCCESS("U005",200, "프로필 조회 성공"),
+  USER_VISIBLE_SUCCESS("U006",200, "프로젝트 공개 여부 수정 성공"),
 
 
   // Project

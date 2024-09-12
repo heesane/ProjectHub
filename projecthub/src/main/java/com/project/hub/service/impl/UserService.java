@@ -1,8 +1,10 @@
 package com.project.hub.service.impl;
 
 import com.project.hub.entity.ProjectLikes;
+import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
 import com.project.hub.model.dto.request.user.UpdateUserProfileRequest;
+import com.project.hub.model.dto.request.user.UpdateUserProjectVisibleRequest;
 import com.project.hub.model.dto.response.projects.ListShortProjectDetail;
 import com.project.hub.model.dto.response.user.Profile;
 import com.project.hub.model.mapper.ShortProjectDetail;
@@ -54,6 +56,16 @@ public class UserService implements com.project.hub.service.UserService {
       User user = validator.validateAndGetUser(request.getUserId());
       user.updateNickname(request.getNickname());
       return user.getNickname();
+  }
+
+  @Transactional
+  @Override
+  public String changeVisible(UpdateUserProjectVisibleRequest request) {
+
+      User user = validator.validateAndGetUser(request.getUserId());
+      Projects project = validator.validateAndGetProject(request.getProjectId());
+      project.updateVisible();
+      return user.getNickname() + "님의 프로젝트가 " + (project.isVisible() ? "공개" : "비공개") + "로 변경되었습니다.";
   }
 
 }

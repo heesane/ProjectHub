@@ -69,4 +69,7 @@ public class User extends BaseTimeEntity{
   public void updateBadge(Badge badge){
     this.badge = badge;
   }
+  public void updateNickname(String nickname){
+    this.nickname = nickname;
+  }
 }

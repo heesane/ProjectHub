@@ -1,6 +1,5 @@
 package com.project.hub.entity;
 
-import com.project.hub.aop.badge.BadgeInterface;
 import com.project.hub.model.type.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

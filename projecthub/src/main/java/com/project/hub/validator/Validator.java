@@ -1,6 +1,5 @@
 package com.project.hub.validator;
 
-import com.project.hub.entity.Badge;
 import com.project.hub.entity.CommentLikes;
 import com.project.hub.entity.Comments;
 import com.project.hub.entity.ProjectLikes;

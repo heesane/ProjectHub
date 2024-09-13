@@ -1,8 +1,13 @@
 package com.project.hub.auth.service;
 
 import com.project.hub.auth.jwt.dto.JwtToken;
+import com.project.hub.entity.User;
+import com.project.hub.exceptions.ExceptionCode;
+import com.project.hub.exceptions.exception.NotFoundException;
 import com.project.hub.exceptions.exception.TokenExpiredException;
 import com.project.hub.exceptions.exception.TokenNotExistsException;
+import com.project.hub.model.type.UserRole;
+import com.project.hub.repository.jpa.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,6 +19,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +32,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenComponent {
 
+  private final UserRepository userRepository;
+
   private final Key hashedSecretKey;
 
   @Value("${jwt.secret-key}")
@@ -37,7 +45,8 @@ public class TokenComponent {
   @Value("${jwt.token.refresh-expire-length}")
   private Long refreshExpireLength; // 리프레시 토큰의 만료 시간
 
-  public TokenComponent(@Value("${jwt.secret-key}") String secretKey) {
+  public TokenComponent(UserRepository userRepository, @Value("${jwt.secret-key}") String secretKey) {
+    this.userRepository = userRepository;
     this.hashedSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
   }
 
@@ -48,9 +57,17 @@ public class TokenComponent {
         .build();
   }
 
-  public String generateAccessToken(Long userId) { // 액세스, 리프레시 토큰 생성 로직 구현
+  // 액세스, 리프레시 토큰 생성 로직 구현
+  public String generateAccessToken(Long userId) {
+    User accessUser = userRepository.findById(userId).orElseThrow(
+        () -> new NotFoundException(ExceptionCode.USER_NOT_FOUND)
+    );
+    UserRole userRole = accessUser.getRole();
+
     Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-    return Jwts.builder().setClaims(claims)
+    claims.put("auth", userRole.name());
+    return Jwts.builder()
+        .setClaims(claims)
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + accessExpireLength))
         .signWith(hashedSecretKey, SignatureAlgorithm.HS256)

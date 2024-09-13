@@ -40,6 +40,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     // 사용자의 Access Token
     Long userId = tokenComponent.getUserIdFromToken(request);
     Claims claims = tokenComponent.extractClaims(request);
+    log.info("claims : {}", claims);
     User loginUser = userService.getUser(userId);
 
     // Expired Check ( Access Token이 만료되기 전)
@@ -47,6 +48,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
       // 바로 통과
       Authentication authentication = tokenComponent.getAuthentication(request);
       SecurityContextHolder.getContext().setAuthentication(authentication);
+      log.info("Token is valid");
 
     }
     // Expired Check ( Access Token 만료된 후, Refresh Token 통한 Token 재발급)

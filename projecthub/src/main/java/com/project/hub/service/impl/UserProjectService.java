@@ -157,6 +157,7 @@ public class UserProjectService implements ProjectService {
         .erdUrl(uploadedErdUrl)
         .githubUrl(request.getGithubUrl())
         .user(user)
+        .visible(request.isVisible())
         .build();
 
     projectRepository.save(project);

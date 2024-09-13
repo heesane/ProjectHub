@@ -45,7 +45,7 @@ public class UserAuthController {
     return ResponseEntity.ok(ResultResponse.of(USER_LOGIN_SUCCESS, jwtToken));
   }
 
-  @PostMapping(value = "/login", consumes = {"multipart/form-data"})
+  @PostMapping(value = "/login")
   @Operation(
       summary = "Login",
       description = "로그인"
@@ -56,7 +56,7 @@ public class UserAuthController {
     return ResponseEntity.ok(ResultResponse.of(USER_LOGIN_SUCCESS, login));
   }
 
-  @PostMapping(value = "/register", consumes = {"multipart/form-data"})
+  @PostMapping(value = "/register")
   @Operation(
       summary = "Register",
       description = "회원가입"

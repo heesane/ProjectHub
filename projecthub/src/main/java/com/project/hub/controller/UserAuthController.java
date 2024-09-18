@@ -4,7 +4,6 @@ import static com.project.hub.model.type.ResultCode.USER_CREATED;
 import static com.project.hub.model.type.ResultCode.USER_LOGIN_SUCCESS;
 
 import com.project.hub.auth.jwt.dto.JwtToken;
-import com.project.hub.model.dto.request.auth.UserLoginRequest;
 import com.project.hub.model.dto.request.auth.UserRegisterRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.dto.response.auth.UserRegisterResponse;
@@ -38,22 +37,16 @@ public class UserAuthController {
   public ResponseEntity<ResultResponse> oauthLogin(
       @RequestParam("a") String accessToken,
       @RequestParam("r") String refreshToken) {
+
+    if(accessToken == null || refreshToken == null) {
+      return ResponseEntity.ok(ResultResponse.of(USER_LOGIN_SUCCESS, "OK"));
+    }
+
     JwtToken jwtToken = JwtToken.builder()
         .accessToken(accessToken)
         .refreshToken(refreshToken)
         .build();
     return ResponseEntity.ok(ResultResponse.of(USER_LOGIN_SUCCESS, jwtToken));
-  }
-
-  @PostMapping(value = "/login")
-  @Operation(
-      summary = "Login",
-      description = "로그인"
-  )
-  public ResponseEntity<ResultResponse> login(
-      @Parameter(description = "Email, Password") @RequestBody @Valid UserLoginRequest jwtLoginRequest) {
-    JwtToken login = JwtAuthService.login(jwtLoginRequest);
-    return ResponseEntity.ok(ResultResponse.of(USER_LOGIN_SUCCESS, login));
   }
 
   @PostMapping(value = "/register")

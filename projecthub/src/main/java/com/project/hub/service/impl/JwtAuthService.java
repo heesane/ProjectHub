@@ -1,7 +1,7 @@
 package com.project.hub.service.impl;
 
 import com.project.hub.auth.jwt.dto.JwtToken;
-import com.project.hub.auth.service.TokenComponent;
+import com.project.hub.auth.service.TokenService;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.ExceptionCode;
 import com.project.hub.exceptions.exception.DuplicatedEmailException;
@@ -27,7 +27,7 @@ public class JwtAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder encoder;
-  private final TokenComponent tokenComponent;
+  private final TokenService tokenService;
 
   @Transactional
   @Override
@@ -66,13 +66,6 @@ public class JwtAuthService implements AuthService {
       throw new UnmatchedPasswordException();
     }
 
-    return tokenComponent.generateToken(user.getId());
-  }
-
-  @Override
-  public User getUser(Long userId) {
-    return userRepository.findById(userId).orElseThrow(
-        () -> new NotFoundException(ExceptionCode.USER_NOT_FOUND)
-    );
+    return tokenService.generateToken(user.getEmail());
   }
 }

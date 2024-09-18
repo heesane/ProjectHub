@@ -9,6 +9,7 @@ import com.project.hub.model.dto.request.projects.ProjectUpdateRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.dto.response.projects.ListShortProjectDetail;
 import com.project.hub.model.dto.response.projects.ProjectDetailResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -21,16 +22,16 @@ public interface ProjectService {
   ProjectDetailResponse getProjectDetail(ProjectRequest request);
 
   // 내 프로젝트 전체 조회
-  ListShortProjectDetail getMyProjectDetail(MyProjectListRequest request);
+  ListShortProjectDetail getMyProjectDetail(HttpServletRequest request, MyProjectListRequest myProjectListRequest);
 
   // 등록
   ResultResponse createProject(ProjectCreateRequest request)
       throws IOException, NoSuchAlgorithmException;
 
   // 수정
-  ResultResponse updateProject(ProjectUpdateRequest request)
+  ResultResponse updateProject(HttpServletRequest request, ProjectUpdateRequest projectUpdateRequest)
       throws IOException, NoSuchAlgorithmException;
 
   // 삭제
-  ResultResponse deleteProject(ProjectDeleteRequest request);
+  ResultResponse deleteProject(HttpServletRequest request, ProjectDeleteRequest projectDeleteRequest);
 }

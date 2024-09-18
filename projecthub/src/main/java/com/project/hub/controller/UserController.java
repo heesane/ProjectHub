@@ -4,9 +4,11 @@ import com.project.hub.model.dto.request.user.UpdateUserProfileRequest;
 import com.project.hub.model.dto.request.user.UpdateUserProjectVisibleRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.type.ResultCode;
-import com.project.hub.service.impl.UserService;
+import com.project.hub.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,15 +25,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/user")
 public class UserController {
 
-  private final UserService userService;
+  private final UserServiceImpl userService;
 
   @Operation(
       summary = "Profile 조회",
       description = "유저 프로필 조회"
   )
   @GetMapping("/profile/{userId}")
-  public ResponseEntity<ResultResponse> getProfile(@PathVariable Long userId) {
-    return ResponseEntity.ok(ResultResponse.of(ResultCode.USER_PROFILE_SUCCESS,userService.myProfile(userId)));
+  public ResponseEntity<ResultResponse> getProfile(HttpServletRequest request,
+      HttpServletResponse response, @PathVariable Long userId) {
+    return ResponseEntity.ok(
+        ResultResponse.of(ResultCode.USER_PROFILE_SUCCESS, userService.myProfile(request, response, userId)));
   }
 
   @Operation(
@@ -39,8 +43,11 @@ public class UserController {
       description = "유저 프로필 수정"
   )
   @PatchMapping("/update")
-  public ResponseEntity<ResultResponse> updateProfile(@RequestBody UpdateUserProfileRequest request) {
-    return ResponseEntity.ok(ResultResponse.of(ResultCode.USER_UPDATE_SUCCESS,userService.changeNickname(request)));
+  public ResponseEntity<ResultResponse> updateProfile(
+      HttpServletRequest request,
+      @RequestBody UpdateUserProfileRequest updateUserProfileRequest) {
+    return ResponseEntity.ok(
+        ResultResponse.of(ResultCode.USER_UPDATE_SUCCESS, userService.changeNickname(request, updateUserProfileRequest)));
   }
 
   @Operation(
@@ -48,7 +55,10 @@ public class UserController {
       description = "프로젝트 공개 여부 수정"
   )
   @PostMapping("/visible")
-  public ResponseEntity<ResultResponse> changeVisible(@RequestBody UpdateUserProjectVisibleRequest request) {
-    return ResponseEntity.ok(ResultResponse.of(ResultCode.USER_VISIBLE_SUCCESS,userService.changeVisible(request)));
+  public ResponseEntity<ResultResponse> changeVisible(
+      HttpServletRequest request,
+      @RequestBody UpdateUserProjectVisibleRequest updateUserProjectVisibleRequest) {
+    return ResponseEntity.ok(
+        ResultResponse.of(ResultCode.USER_VISIBLE_SUCCESS, userService.changeVisible(request,updateUserProjectVisibleRequest)));
   }
 }

@@ -7,6 +7,7 @@ import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.service.impl.UserCommentsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,8 @@ public class UserCommentsController {
       summary = "Post Comment",
       description = "댓글 작성 및 대댓글 작성 (대댓글 작성 시 parentId 기재 필수)"
   )
-  public ResponseEntity<ResultResponse> postComment(@RequestBody WriteCommentRequest request) {
+  public ResponseEntity<ResultResponse> postComment(
+      @RequestBody WriteCommentRequest request) {
     log.info("request: {}", request);
     ResultResponse response = userCommentsService.createComment(request);
     return ResponseEntity.ok(response);
@@ -45,8 +47,10 @@ public class UserCommentsController {
       summary = "Update Comment",
       description = "댓글 수정"
   )
-  public ResponseEntity<ResultResponse> updateComment(@RequestBody UpdateCommentRequest request) {
-    ResultResponse response = userCommentsService.updateComment(request);
+  public ResponseEntity<ResultResponse> updateComment(
+      HttpServletRequest request,
+      @RequestBody UpdateCommentRequest updateCommentRequest) {
+    ResultResponse response = userCommentsService.updateComment(request,updateCommentRequest);
     return ResponseEntity.ok(response);
   }
 
@@ -55,8 +59,9 @@ public class UserCommentsController {
       summary = "Delete Comment",
       description = "댓글 삭제"
   )
-  public ResponseEntity<ResultResponse> deleteComment(@RequestBody DeleteCommentRequest commentId) {
-    ResultResponse response = userCommentsService.deleteComment(commentId);
+  public ResponseEntity<ResultResponse> deleteComment(
+      HttpServletRequest request,@RequestBody DeleteCommentRequest deleteCommentRequest) {
+    ResultResponse response = userCommentsService.deleteComment(request,deleteCommentRequest);
     return ResponseEntity.ok(response);
   }
 }

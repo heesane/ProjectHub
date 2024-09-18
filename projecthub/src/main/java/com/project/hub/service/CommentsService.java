@@ -4,6 +4,7 @@ import com.project.hub.model.dto.request.comments.DeleteCommentRequest;
 import com.project.hub.model.dto.request.comments.UpdateCommentRequest;
 import com.project.hub.model.dto.request.comments.WriteCommentRequest;
 import com.project.hub.model.dto.response.ResultResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface CommentsService {
 
@@ -11,8 +12,10 @@ public interface CommentsService {
   ResultResponse createComment(WriteCommentRequest request);
 
   // 댓글 수정
-  ResultResponse updateComment(UpdateCommentRequest request);
+  ResultResponse updateComment(HttpServletRequest request,
+      UpdateCommentRequest updateCommentRequest);
 
   // 댓글 삭제
-  ResultResponse deleteComment(DeleteCommentRequest request);
+  ResultResponse deleteComment(HttpServletRequest request,
+      DeleteCommentRequest deleteCommentRequest);
 }

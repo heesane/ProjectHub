@@ -12,8 +12,10 @@ import com.project.hub.auth.oauth.handler.OAuth2SuccessHandler;
 import com.project.hub.auth.service.TokenService;
 import com.project.hub.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,6 +27,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @RequiredArgsConstructor
@@ -49,17 +52,25 @@ public class SecurityConfig {
         .headers(headers -> headers.frameOptions(
             HeadersConfigurer.FrameOptionsConfig::sameOrigin))
         .authorizeHttpRequests(requests ->
-                requests.requestMatchers("/**").permitAll()
-//            requests
-//                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-//                .requestMatchers("/v3/**","swagger-ui/**").permitAll()
-//                .requestMatchers("/api/v1/auth/login","/api/v1/auth/register").permitAll()
-//                .requestMatchers("/api/v1/user/profile/**").authenticated()
+//                requests.requestMatchers("/**").permitAll()
+            requests
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers("/v3/**","/swagger-ui/**","/oauth2/**").permitAll()
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/badge/all").permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/project/{number:\\d+}", HttpMethod.GET.name())).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/project/list", HttpMethod.GET.name())).permitAll()
+                .requestMatchers("/api/v1/user/**","/api/v1/comments/**","/api/v1/project/**","/api/v1/badge/**","/api/v1/like/**").authenticated()
+
         )
         .sessionManagement(sessionManagement ->
             sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .oauth2Login(oauth2Login -> oauth2Login
+            // Custom Redirection Endpoint는 사용하지 않음 (사용할 경우, accessToken과 refreshToken이 노출됨.)
+//            .redirectionEndpoint(redirectionEndpoint -> redirectionEndpoint
+//                .baseUri("/api/v1/auth")
+//            )
             .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                 .userService(customOAuth2UserService)
             )

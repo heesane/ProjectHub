@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +27,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-  private static final String NO_CHECK_URL = "/api/v1/auth/login";
+  private static final List<String> NO_CHECK_URL = List.of("/api/v1/auth/login", "/api/v1/auth");
 
   private final TokenService tokenService;
   private final UserRepository userRepository;
@@ -35,7 +36,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    if (request.getRequestURI().equals(NO_CHECK_URL)) {
+    if (NO_CHECK_URL.contains(request.getRequestURI())) {
       filterChain.doFilter(request, response);
       return;
     }

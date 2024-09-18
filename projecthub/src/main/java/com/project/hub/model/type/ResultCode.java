@@ -10,7 +10,9 @@ public enum ResultCode {
   // User
   USER_CREATED("U001",201, "회원가입 성공"),
   USER_OAUTH_LOGIN_SUCCESS("U001",201, "소셜 로그인 성공"),
+  USER_OAUTH_REGISTER_SUCCESS("U001",201, "소셜 회원가입 성공"),
   USER_LOGIN_SUCCESS("U002", 200,"로그인 성공"),
+  USER_LOGIN_FAIL("U002", 401,"로그인 실패"),
   USER_DETAIL_INFO_SUCCESS("U003",200, "유저 정보 조회 성공"),
   USER_UPDATE_SUCCESS("U004",200, "유저 정보 수정 성공"),
   USER_PROFILE_SUCCESS("U005",200, "프로필 조회 성공"),

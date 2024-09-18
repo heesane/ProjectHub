@@ -18,6 +18,8 @@ public enum ExceptionCode {
   DUPLICATE_NICKNAME(HttpStatus.CONFLICT.value(), "A004", "이미 존재하는 닉네임"),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "A005", "사용자를 찾을 수 없음"),
   UNMATCHED_PASSWORD(HttpStatus.BAD_REQUEST.value(), "A006", "비밀번호가 일치하지 않음"),
+  ERROR_OAUTH(HttpStatus.BAD_REQUEST.value(), "A007", "OAuth 인증 오류"),
+  INVALID_OAUTH_CODE(HttpStatus.BAD_REQUEST.value(), "A008", "잘못된 OAuth 코드"),
 
   // Project
   PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "P001", "프로젝트를 찾을 수 없음"),

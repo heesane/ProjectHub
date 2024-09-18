@@ -7,7 +7,7 @@ import com.project.hub.model.dto.request.projects.ProjectListRequest;
 import com.project.hub.model.dto.request.projects.ProjectRequest;
 import com.project.hub.model.dto.request.projects.ProjectUpdateRequest;
 import com.project.hub.model.dto.response.ResultResponse;
-import com.project.hub.model.dto.response.projects.ListProjectResponse;
+import com.project.hub.model.dto.response.projects.ListShortProjectDetail;
 import com.project.hub.model.dto.response.projects.ProjectDetailResponse;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -15,13 +15,13 @@ import java.security.NoSuchAlgorithmException;
 public interface ProjectService {
 
   // 전체 조회(각 프로젝트별 title, subject)
-  ListProjectResponse listProjects(ProjectListRequest request);
+  ListShortProjectDetail listProjects(ProjectListRequest request);
 
   // 단건 조회 (프로젝트별 상세정보)
   ProjectDetailResponse getProjectDetail(ProjectRequest request);
 
   // 내 프로젝트 전체 조회
-  ListProjectResponse getMyProjectDetail(MyProjectListRequest request);
+  ListShortProjectDetail getMyProjectDetail(MyProjectListRequest request);
 
   // 등록
   ResultResponse createProject(ProjectCreateRequest request)

@@ -1,13 +1,19 @@
 package com.project.hub.validator;
 
+import com.project.hub.entity.CommentLikes;
 import com.project.hub.entity.Comments;
+import com.project.hub.entity.ProjectLikes;
 import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.ExceptionCode;
 import com.project.hub.exceptions.exception.NotFoundException;
+import com.project.hub.repository.jpa.BadgeRepository;
+import com.project.hub.repository.jpa.CommentsLikeRepository;
 import com.project.hub.repository.jpa.CommentsRepository;
 import com.project.hub.repository.jpa.ProjectRepository;
+import com.project.hub.repository.jpa.ProjectsLikeRepository;
 import com.project.hub.repository.jpa.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +27,20 @@ public class Validator {
 
   private final UserRepository userRepository;
 
+  private final ProjectsLikeRepository projectsLikeRepository;
+
+  private final CommentsLikeRepository commentsLikeRepository;
+
+  private final BadgeRepository badgeRepository;
+
   public Comments validateAndGetComment(Long commentId) {
     return commentsRepository.findById(commentId).orElseThrow(
         () -> new NotFoundException(ExceptionCode.COMMENTS_NOT_FOUND)
     );
+  }
+
+  public Long validateAndGetUserCommentsCount(Long userId) {
+    return commentsRepository.countByUserId(userId);
   }
 
   public void isCommentExist(Long commentId) {
@@ -56,5 +72,19 @@ public class Validator {
     if (!userRepository.existsById(userId)) {
       throw new NotFoundException(ExceptionCode.USER_NOT_FOUND);
     }
+  }
+
+  public List<ProjectLikes> validateAndGetProjectLike(Long userId) {
+    if(!userRepository.existsById(userId)) {
+      throw new NotFoundException(ExceptionCode.USER_NOT_FOUND);
+    }
+    return projectsLikeRepository.findAllByUserId(userId);
+  }
+
+  public List<CommentLikes> validateAndGetCommentLike(Long userId) {
+    if(!userRepository.existsById(userId)) {
+      throw new NotFoundException(ExceptionCode.USER_NOT_FOUND);
+    }
+    return commentsLikeRepository.findAllByUserId(userId);
   }
 }

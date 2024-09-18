@@ -15,7 +15,7 @@ import com.project.hub.model.dto.request.projects.ProjectRequest;
 import com.project.hub.model.dto.request.projects.ProjectUpdateRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.dto.response.comments.Comment;
-import com.project.hub.model.dto.response.projects.ListProjectResponse;
+import com.project.hub.model.dto.response.projects.ListShortProjectDetail;
 import com.project.hub.model.dto.response.projects.ProjectDetailResponse;
 import com.project.hub.model.mapper.ProjectDetail;
 import com.project.hub.model.mapper.ShortProjectDetail;
@@ -52,7 +52,7 @@ public class UserProjectService implements ProjectService {
   private final Validator validator;
 
   @Override
-  public ListProjectResponse listProjects(ProjectListRequest request) {
+  public ListShortProjectDetail listProjects(ProjectListRequest request) {
 
     Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
 
@@ -68,7 +68,7 @@ public class UserProjectService implements ProjectService {
       List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
           .collect(Collectors.toList());
 
-      return new ListProjectResponse(collect);
+      return new ListShortProjectDetail(collect);
 
     } else if (sort == Sorts.LIKE) {
 //      return projectRepository.findAllByLike(request); (추후 좋아요 기능 구현시)
@@ -89,7 +89,7 @@ public class UserProjectService implements ProjectService {
   }
 
   @Override
-  public ListProjectResponse getMyProjectDetail(MyProjectListRequest request) {
+  public ListShortProjectDetail getMyProjectDetail(MyProjectListRequest request) {
 
     validator.isUserExist(request.getUserId());
 
@@ -110,7 +110,7 @@ public class UserProjectService implements ProjectService {
       List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
           .collect(Collectors.toList());
 
-      return new ListProjectResponse(collect);
+      return new ListShortProjectDetail(collect);
 
     } else if (sort == Sorts.LIKE) {
 //      return projectRepository.findAllByLike(request); (추후 좋아요 기능 구현시)

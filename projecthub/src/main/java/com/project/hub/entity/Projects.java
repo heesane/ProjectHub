@@ -121,8 +121,8 @@ public class Projects extends BaseTimeEntity implements DistributedLockInterface
     this.visible = request.isVisible();
   }
 
-  public void updateVisible(boolean visible) {
-    this.visible = visible;
+  public void updateVisible() {
+    this.visible = !visible;
   }
 
   public void updateLikeCounts(long likeCounts) {

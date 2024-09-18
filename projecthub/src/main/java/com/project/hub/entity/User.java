@@ -1,6 +1,5 @@
 package com.project.hub.entity;
 
-import com.project.hub.aop.badge.BadgeInterface;
 import com.project.hub.model.type.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -68,5 +67,8 @@ public class User extends BaseTimeEntity{
 
   public void updateBadge(Badge badge){
     this.badge = badge;
+  }
+  public void updateNickname(String nickname){
+    this.nickname = nickname;
   }
 }

@@ -27,6 +27,27 @@ public class UserSearchService implements SearchService {
   private final ProjectDocumentsRepository projectDocumentsRepository;
   private final ProjectRepository projectRepository;
 
+  @Cacheable(value = "project", key = "#keyword + '_' + #page + '_' + #size + '_' + #searchType")
+  @Override
+  public List<ProjectDocuments> searchProjectByTitleLike(
+      String keyword,
+      int page,
+      int size,
+      SearchType searchType) {
+    Sort sortOption = Sort.by(Direction.DESC, searchType.getSort());
+    Pageable pageable = PageRequest.of(page, size, sortOption);
+    return projectDocumentsRepository.findByTitleLike(keyword,pageable);
+  }
+
+  @Cacheable(value = "allProject", key = "#page + '_' + #size + '_' + #searchType")
+  @Override
+  public Iterable<ProjectDocuments> findAllInElasticSearch(int page, int size, SearchType searchType) {
+    Sort sortOption = Sort.by(Direction.DESC, searchType.getSort());
+    Pageable Page = PageRequest.of(page, size, sortOption);
+
+    return projectDocumentsRepository.findAll(Page);
+  }
+
   @Override
   public ProjectDocuments searchProjectByTitle(String keyword) {
     return projectDocumentsRepository.findByTitle(keyword).orElseThrow(

@@ -1,10 +1,12 @@
 package com.project.hub.service.impl;
 
 import com.project.hub.aop.badge.BadgeCheck;
+import com.project.hub.auth.service.TokenService;
 import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.ExceptionCode;
 import com.project.hub.exceptions.exception.NotFoundException;
+import com.project.hub.exceptions.exception.TokenNotExistsException;
 import com.project.hub.exceptions.exception.UnmatchedUserException;
 import com.project.hub.model.documents.ProjectDocuments;
 import com.project.hub.model.dto.request.projects.MyProjectListRequest;
@@ -27,6 +29,7 @@ import com.project.hub.repository.jpa.ProjectRepository;
 import com.project.hub.service.ProjectService;
 import com.project.hub.util.PictureManager;
 import com.project.hub.validator.Validator;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
@@ -50,6 +53,7 @@ public class UserProjectService implements ProjectService {
   private final ProjectDocumentsRepository projectDocumentsRepository;
   private final PictureManager pictureManager;
   private final Validator validator;
+  private final TokenService tokenService;
 
   @Override
   public ListShortProjectDetail listProjects(ProjectListRequest request) {
@@ -89,22 +93,29 @@ public class UserProjectService implements ProjectService {
   }
 
   @Override
-  public ListShortProjectDetail getMyProjectDetail(MyProjectListRequest request) {
+  public ListShortProjectDetail getMyProjectDetail(HttpServletRequest request,
+      MyProjectListRequest myProjectListRequest) {
 
-    validator.isUserExist(request.getUserId());
+    String userEmail = tokenService.extractEmail(request).orElseThrow(TokenNotExistsException::new);
+
+    User user = validator.validateAndGetUser(myProjectListRequest.getUserId());
+
+    if (!userEmail.equals(user.getEmail())) {
+      throw new UnmatchedUserException();
+    }
 
     Pageable pageable;
 
-    Sorts sort = request.getSort();
+    Sorts sort = myProjectListRequest.getSort();
 
     // 추후 개발을 위해 우선 선언
     Page<Projects> sortedProjects;
 
     if (sort == Sorts.LATEST) {
-      pageable = PageRequest.of(request.getPage(), request.getSize(),
+      pageable = PageRequest.of(myProjectListRequest.getPage(), myProjectListRequest.getSize(),
           Sort.by(Sort.Direction.DESC, "registeredAt"));
       sortedProjects = projectRepository.findAllByUserId(
-          request.getUserId(),
+          myProjectListRequest.getUserId(),
           pageable);
 
       List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
@@ -157,6 +168,7 @@ public class UserProjectService implements ProjectService {
         .erdUrl(uploadedErdUrl)
         .githubUrl(request.getGithubUrl())
         .user(user)
+        .visible(request.isVisible())
         .build();
 
     projectRepository.save(project);
@@ -169,60 +181,84 @@ public class UserProjectService implements ProjectService {
 
   @Override
   @Transactional
-  public ResultResponse updateProject(ProjectUpdateRequest request)
+  public ResultResponse updateProject(HttpServletRequest request,ProjectUpdateRequest projectUpdateRequest)
       throws IOException {
 
-    Long userId = request.getUserId();
+    String userEmail = tokenService.extractEmail(request).orElseThrow(TokenNotExistsException::new);
+    log.info("findById");
+    Projects projects = projectRepository.findById(projectUpdateRequest.getProjectId()).orElseThrow(
+        () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)
+    );
+    log.info("project title : {}", projects.getTitle());
+    log.info("findById-end");
+
+    User user = validator.validateAndGetUser(projectUpdateRequest.getUserId());
+
+    if (!userEmail.equals(user.getEmail())) {
+      throw new UnmatchedUserException();
+    }
+
+    Long userId = user.getId();
 
     validator.isUserExist(userId);
 
-    Long projectId = request.getProjectId();
+    Long projectId = projectUpdateRequest.getProjectId();
 
-    Projects project = validator.validateAndGetProject(projectId);
+    log.info("projectId : {}", projectId);
+
+//    Projects project = validator.validateAndGetProject(projectId);
 
     // 사용자가 등록한 프로젝트가 아닌 경우
-    if (!project.getUser().getId().equals(userId)) {
+    if (!projects.getUser().getId().equals(userId)) {
       throw new UnmatchedUserException();
     }
 
     // 업데이트 요청 시 이미지가 있는 경우만 변경
-    if (request.getSystemArchitecturePicture() != null && !request.getSystemArchitecturePicture()
+    if (projectUpdateRequest.getSystemArchitecturePicture() != null && !projectUpdateRequest.getSystemArchitecturePicture()
         .isEmpty()) {
       String uploadedSystemArchitectureUrl = pictureManager.upload(
           userId,
-          request.getTitle(),
-          request.getSystemArchitecturePicture(),
+          projectUpdateRequest.getTitle(),
+          projectUpdateRequest.getSystemArchitecturePicture(),
           PictureType.SYSTEM_ARCHITECTURE
       );
-      project.updateSystemArchitecture(uploadedSystemArchitectureUrl);
+      projects.updateSystemArchitecture(uploadedSystemArchitectureUrl);
     }
 
-    if (request.getErdPicture() != null) {
+    if (projectUpdateRequest.getErdPicture() != null) {
       String uploadedErdUrl = pictureManager.upload(
           userId,
-          request.getTitle(),
-          request.getErdPicture(),
+          projectUpdateRequest.getTitle(),
+          projectUpdateRequest.getErdPicture(),
           PictureType.ERD
       );
-      project.updateErd(uploadedErdUrl);
+      projects.updateErd(uploadedErdUrl);
     }
 
-    project.update(request);
+    projects.update(projectUpdateRequest);
 
-    updateProjectsElasticsearch(project);
+    updateProjectsElasticsearch(projects);
 
     return ResultResponse.of(ResultCode.PROJECT_UPDATE_SUCCESS);
   }
 
   @Override
   @Transactional
-  public ResultResponse deleteProject(ProjectDeleteRequest request) {
+  public ResultResponse deleteProject(
+      HttpServletRequest request,
+      ProjectDeleteRequest projectDeleteRequest) {
 
-    Long userId = request.getUserId();
+    String userEmail = tokenService.extractEmail(request).orElseThrow(TokenNotExistsException::new);
 
-    validator.isUserExist(userId);
+    User user = validator.validateAndGetUser(projectDeleteRequest.getUserId());
 
-    Long projectId = request.getProjectId();
+    if (!userEmail.equals(user.getEmail())) {
+      throw new UnmatchedUserException();
+    }
+
+    Long userId = user.getId();
+
+    Long projectId = projectDeleteRequest.getProjectId();
 
     Projects project = projectRepository.findById(projectId).orElseThrow(
         () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)

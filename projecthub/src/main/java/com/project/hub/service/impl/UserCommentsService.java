@@ -1,11 +1,13 @@
 package com.project.hub.service.impl;
 
 import com.project.hub.aop.badge.BadgeCheck;
+import com.project.hub.auth.service.TokenService;
 import com.project.hub.entity.Comments;
 import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.ExceptionCode;
 import com.project.hub.exceptions.exception.NotFoundException;
+import com.project.hub.exceptions.exception.TokenNotExistsException;
 import com.project.hub.exceptions.exception.UnmatchedUserException;
 import com.project.hub.model.documents.ProjectDocuments;
 import com.project.hub.model.dto.request.comments.DeleteCommentRequest;
@@ -18,6 +20,7 @@ import com.project.hub.repository.jpa.CommentsRepository;
 import com.project.hub.service.CommentsService;
 import com.project.hub.util.UpdateManager;
 import com.project.hub.validator.Validator;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,7 @@ public class UserCommentsService implements CommentsService {
   private final CommentsRepository commentsRepository;
   private final ProjectDocumentsRepository projectDocumentsRepository;
   private final Validator validator;
+  private final TokenService tokenService;
 
   @BadgeCheck
   @Override
@@ -89,27 +93,38 @@ public class UserCommentsService implements CommentsService {
   }
 
   @Override
-  public ResultResponse updateComment(UpdateCommentRequest request) {
+  public ResultResponse updateComment(HttpServletRequest request,
+      UpdateCommentRequest updateCommentRequest) {
 
-    validator.isUserExist(request.getUserId());
+    String userEmail = tokenService.extractEmail(request).orElseThrow(TokenNotExistsException::new);
 
-    validator.isProjectExist(request.getProjectId());
+    User user = validator.validateAndGetUser(updateCommentRequest.getUserId());
 
-    Comments oldComment = validator.validateAndGetComment(request.getCommentId());
+    if(!user.getEmail().equals(userEmail)) {
+      throw new UnmatchedUserException();
+    }
 
-    oldComment.update(request);
+    validator.isProjectExist(updateCommentRequest.getProjectId());
+
+    Comments oldComment = validator.validateAndGetComment(updateCommentRequest.getCommentId());
+
+    oldComment.update(updateCommentRequest);
 
     return ResultResponse.of(ResultCode.COMMENT_UPDATE_SUCCESS, oldComment.getId());
   }
 
   @Override
-  public ResultResponse deleteComment(DeleteCommentRequest request) {
+  public ResultResponse deleteComment(HttpServletRequest request,
+      DeleteCommentRequest deleteCommentRequest) {
 
-    validator.isUserExist(request.getUserId());
+    String userEmail = tokenService.extractEmail(request).orElseThrow(TokenNotExistsException::new);
 
-    Comments oldComments = validator.validateAndGetComment(request.getCommentId());
+    validator.isUserExist(deleteCommentRequest.getUserId());
 
-    if (!oldComments.getUser().getId().equals(request.getUserId())) {
+    Comments oldComments = validator.validateAndGetComment(deleteCommentRequest.getCommentId());
+
+    if (!oldComments.getUser().getId().equals(deleteCommentRequest.getUserId())
+        || !oldComments.getUser().getEmail().equals(userEmail)) {
       throw new UnmatchedUserException();
     }
 

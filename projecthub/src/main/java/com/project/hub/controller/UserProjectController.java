@@ -13,6 +13,7 @@ import com.project.hub.model.type.ResultCode;
 import com.project.hub.service.impl.UserProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -67,10 +67,10 @@ public class UserProjectController {
       summary = "Get My Projects",
       description = "내 프로젝트 리스트 조회"
   )
-  public ResponseEntity<ResultResponse> getMyProjects(
-      @ModelAttribute @Valid MyProjectListRequest request) {
+  public ResponseEntity<ResultResponse> getMyProjects(HttpServletRequest request,
+      @ModelAttribute @Valid MyProjectListRequest myProjectListRequest) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_LIST_SUCCESS,
-        userProjectService.getMyProjectDetail(request)));
+        userProjectService.getMyProjectDetail(request,myProjectListRequest)));
   }
 
   @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -91,10 +91,11 @@ public class UserProjectController {
       description = "프로젝트 수정"
   )
   public ResponseEntity<ResultResponse> updateProject(
-      @ModelAttribute @Valid ProjectUpdateRequest request)
+      HttpServletRequest request,
+      @ModelAttribute @Valid ProjectUpdateRequest projectUpdateRequest)
       throws IOException {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_UPDATE_SUCCESS,
-        userProjectService.updateProject(request)));
+        userProjectService.updateProject(request,projectUpdateRequest)));
   }
 
   @DeleteMapping(value = "/delete", consumes = {"application/json"})
@@ -103,9 +104,10 @@ public class UserProjectController {
       description = "프로젝트 삭제"
   )
   public ResponseEntity<ResultResponse> deleteProject(
-      @RequestBody @Valid ProjectDeleteRequest request) {
+      HttpServletRequest request,
+      @RequestBody @Valid ProjectDeleteRequest projectDeleteRequest) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_DELETE_SUCCESS,
-        userProjectService.deleteProject(request)));
+        userProjectService.deleteProject(request, projectDeleteRequest)));
   }
 }
 

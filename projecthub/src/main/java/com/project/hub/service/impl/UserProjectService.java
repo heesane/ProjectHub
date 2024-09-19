@@ -62,24 +62,33 @@ public class UserProjectService implements ProjectService {
 
     Sorts sort = request.getSort();
 
-    // 추후 개발을 위해 우선 선언
-    Page<Projects> sortedProjects;
-
     if (sort == Sorts.LATEST) {
       pageable.getSort().and(Sort.by(Sort.Direction.DESC, "registeredAt"));
-      sortedProjects = projectRepository.findAll(pageable);
+      Page<Projects> sortedProjects = projectRepository.findAll(pageable);
 
       List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
           .collect(Collectors.toList());
 
       return new ListShortProjectDetail(collect);
 
-    } else if (sort == Sorts.LIKE) {
-//      return projectRepository.findAllByLike(request); (추후 좋아요 기능 구현시)
-      return null;
-    } else if (sort == Sorts.COMMENTS) {
-//      return projectRepository.findAllByComments(request); (추후 댓글 기능 구현시)
-      return null;
+    }
+    else if (sort == Sorts.LIKE) {
+      pageable.getSort().and(Sort.by(Sort.Direction.ASC, "like_counts"));
+      Page<Projects> sortedProjects = projectRepository.findAll(pageable);
+
+      List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
+          .collect(Collectors.toList());
+
+      return new ListShortProjectDetail(collect);
+    }
+    else if (sort == Sorts.COMMENTS) {
+      pageable.getSort().and(Sort.by(Sort.Direction.DESC, "comment_counts"));
+      Page<Projects> sortedProjects = projectRepository.findAllOrderByCommentsCountDesc(pageable);
+
+      List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
+          .collect(Collectors.toList());
+
+      return new ListShortProjectDetail(collect);
     }
     return null;
   }
@@ -104,17 +113,12 @@ public class UserProjectService implements ProjectService {
       throw new UnmatchedUserException();
     }
 
-    Pageable pageable;
-
     Sorts sort = myProjectListRequest.getSort();
 
-    // 추후 개발을 위해 우선 선언
-    Page<Projects> sortedProjects;
-
     if (sort == Sorts.LATEST) {
-      pageable = PageRequest.of(myProjectListRequest.getPage(), myProjectListRequest.getSize(),
+      Pageable pageable = PageRequest.of(myProjectListRequest.getPage(), myProjectListRequest.getSize(),
           Sort.by(Sort.Direction.DESC, "registeredAt"));
-      sortedProjects = projectRepository.findAllByUserId(
+      Page<Projects> sortedProjects = projectRepository.findAllByUserId(
           myProjectListRequest.getUserId(),
           pageable);
 
@@ -124,11 +128,25 @@ public class UserProjectService implements ProjectService {
       return new ListShortProjectDetail(collect);
 
     } else if (sort == Sorts.LIKE) {
-//      return projectRepository.findAllByLike(request); (추후 좋아요 기능 구현시)
-      return null;
+      Pageable pageable = PageRequest.of(myProjectListRequest.getPage(), myProjectListRequest.getSize(),
+          Sort.by(Sort.Direction.DESC, "likeCounts"));
+      Page<Projects> sortedProjects = projectRepository.findAllByUserId(myProjectListRequest.getUserId(), pageable);
+
+      List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
+          .collect(Collectors.toList());
+
+      return new ListShortProjectDetail(collect);
     } else if (sort == Sorts.COMMENTS) {
-//      return projectRepository.findAllByComments(request); (추후 댓글 기능 구현시)
-      return null;
+      Pageable pageable = PageRequest.of(myProjectListRequest.getPage(), myProjectListRequest.getSize(),
+          Sort.by(Sort.Direction.DESC, "comments"));
+      Page<Projects> sortedProjects = projectRepository.findAllByUserId(
+          myProjectListRequest.getUserId(),
+          pageable);
+
+      List<ShortProjectDetail> collect = sortedProjects.stream().map(ShortProjectDetail::new)
+          .collect(Collectors.toList());
+
+      return new ListShortProjectDetail(collect);
     }
     return null;
   }
@@ -181,16 +199,15 @@ public class UserProjectService implements ProjectService {
 
   @Override
   @Transactional
-  public ResultResponse updateProject(HttpServletRequest request,ProjectUpdateRequest projectUpdateRequest)
+  public ResultResponse updateProject(HttpServletRequest request,
+      ProjectUpdateRequest projectUpdateRequest)
       throws IOException {
 
     String userEmail = tokenService.extractEmail(request).orElseThrow(TokenNotExistsException::new);
-    log.info("findById");
+
     Projects projects = projectRepository.findById(projectUpdateRequest.getProjectId()).orElseThrow(
         () -> new NotFoundException(ExceptionCode.PROJECT_NOT_FOUND)
     );
-    log.info("project title : {}", projects.getTitle());
-    log.info("findById-end");
 
     User user = validator.validateAndGetUser(projectUpdateRequest.getUserId());
 
@@ -206,15 +223,14 @@ public class UserProjectService implements ProjectService {
 
     log.info("projectId : {}", projectId);
 
-//    Projects project = validator.validateAndGetProject(projectId);
-
     // 사용자가 등록한 프로젝트가 아닌 경우
     if (!projects.getUser().getId().equals(userId)) {
       throw new UnmatchedUserException();
     }
 
     // 업데이트 요청 시 이미지가 있는 경우만 변경
-    if (projectUpdateRequest.getSystemArchitecturePicture() != null && !projectUpdateRequest.getSystemArchitecturePicture()
+    if (projectUpdateRequest.getSystemArchitecturePicture() != null
+        && !projectUpdateRequest.getSystemArchitecturePicture()
         .isEmpty()) {
       String uploadedSystemArchitectureUrl = pictureManager.upload(
           userId,

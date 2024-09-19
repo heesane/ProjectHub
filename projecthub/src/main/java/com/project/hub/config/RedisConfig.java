@@ -70,9 +70,12 @@ public class RedisConfig {
     return RedisCacheManager.builder(redisConnectionFactory)
         // TTL 60초
         .cacheDefaults(redisCacheConfiguration(60))
-        .withCacheConfiguration("projectSortedByLatest", redisCacheConfiguration(600))
-        .withCacheConfiguration("projectSortedByComments", redisCacheConfiguration(600))
-        .withCacheConfiguration("projectSortedByLikes", redisCacheConfiguration(600))
+        .withCacheConfiguration("project_LATEST", redisCacheConfiguration(600))
+        .withCacheConfiguration("project_POPULAR", redisCacheConfiguration(600))
+        .withCacheConfiguration("project_COMMENT", redisCacheConfiguration(600))
+        .withCacheConfiguration("allProject_LATEST", redisCacheConfiguration(600))
+        .withCacheConfiguration("allProject_POPULAR", redisCacheConfiguration(600))
+        .withCacheConfiguration("allProject_COMMENT", redisCacheConfiguration(600))
         .build();
   }
 
@@ -83,11 +86,10 @@ public class RedisConfig {
             RedisSerializationContext.SerializationPair.fromSerializer(
                 new StringRedisSerializer())
         )
-        .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
-            new GenericJackson2JsonRedisSerializer())
+        .serializeValuesWith(
+            RedisSerializationContext.SerializationPair.fromSerializer(
+                new GenericJackson2JsonRedisSerializer())
         )
         .entryTtl(Duration.ofSeconds(seconds));
   }
-
-
 }

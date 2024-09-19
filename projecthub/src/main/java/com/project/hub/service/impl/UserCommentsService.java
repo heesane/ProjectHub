@@ -66,9 +66,9 @@ public class UserCommentsService implements CommentsService {
           .parentComment(parentComment)
           .build();
 
-      UpdateManager.incrementProjectCommentCount(projectDocuments, commentedProject);
-
       commentsRepository.save(newComments);
+
+      UpdateManager.incrementProjectCommentCount(projectDocuments, validator.validateAndGetProject(request.getProjectId()));
 
       projectDocumentsRepository.save(projectDocuments);
 

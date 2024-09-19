@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .requestMatchers("/v3/**","/swagger-ui/**","/oauth2/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/badge/all").permitAll()
+                .requestMatchers("/api/v1/search/**").permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/project/{number:\\d+}", HttpMethod.GET.name())).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/project/list", HttpMethod.GET.name())).permitAll()
                 .requestMatchers("/api/v1/user/**","/api/v1/comments/**","/api/v1/project/**","/api/v1/badge/**","/api/v1/like/**").authenticated()

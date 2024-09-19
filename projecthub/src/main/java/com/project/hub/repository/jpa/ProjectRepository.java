@@ -20,6 +20,8 @@ public interface ProjectRepository extends JpaRepository<Projects, Long> {
   Page<Projects> findAllByUserId(Long userId, Pageable pageable);
 
   // 댓글 순(추후 댓글 구현시)
+  @Query("SELECT p FROM Projects p LEFT JOIN p.comments c GROUP BY p.id ORDER BY COUNT(c) DESC")
+  Page<Projects> findAllOrderByCommentsCountDesc(Pageable pageable);
 
   // 좋아요 순(추후 좋아요 구현시)
   @Query("select p from Projects p JOIN fetch p.user where p.id = :projectId")

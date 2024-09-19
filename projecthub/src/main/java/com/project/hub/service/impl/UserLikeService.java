@@ -130,7 +130,8 @@ public class UserLikeService implements LikeService {
           userId -> updateProjectLikeTable(targetId, Long.parseLong(userId)));
       // 업데이트 된 Project Entity 저장
       projectsRepository.saveAndFlush(project);
-    } else {
+    }
+    else {
       Comments comments = commentsRepository.findById(targetId).orElseThrow(
           () -> new NotFoundException(ExceptionCode.COMMENTS_NOT_FOUND)
       );

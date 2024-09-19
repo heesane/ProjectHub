@@ -103,7 +103,6 @@ public class JwtAuthService implements AuthService {
 
         String accessToken = exchangeCodeForToken(code);
         Map userInfo = getUserInfo(accessToken);
-        log.info("userInfo : {}", userInfo);
 
         String email = (String) userInfo.get("email");
         String nickname = (String) userInfo.get("name");

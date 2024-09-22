@@ -52,7 +52,8 @@ public class UserServiceImpl implements UserService {
         .projects(new ListShortProjectDetail(userProjectList))
         .likedProjects(
             new ListShortProjectDetail(
-                validator.validateAndGetProjectLike(userId).stream()
+                validator.validateAndGetProjectLike(userId)
+                    .stream()
                     .map(ProjectLikes::getProjectId)
                     .map(validator::validateAndGetProject)
                     .map(ShortProjectDetail::new)

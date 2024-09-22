@@ -4,7 +4,7 @@ import com.project.hub.model.dto.request.badge.CreateBadgeRequest;
 import com.project.hub.model.dto.request.badge.DeleteBadgeRequest;
 import com.project.hub.model.dto.request.badge.UpdateBadgeRequest;
 import com.project.hub.model.dto.response.ResultResponse;
-import com.project.hub.service.impl.UserBadgeService;
+import com.project.hub.service.BadgeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/badge")
 public class UserBadgeController {
 
-  private final UserBadgeService userBadgeService;
+  private final BadgeService badgeService;
 
   @Operation(
       summary = "모든 뱃지 조회",
@@ -32,7 +32,7 @@ public class UserBadgeController {
   )
   @GetMapping("/all")
   public ResponseEntity<ResultResponse> getAllBadges() {
-    return ResponseEntity.ok(userBadgeService.getAllBadges());
+    return ResponseEntity.ok(badgeService.getAllBadges());
   }
 
   @Operation(
@@ -41,7 +41,7 @@ public class UserBadgeController {
   )
   @PostMapping("/create")
   public ResponseEntity<ResultResponse> createNewBadge(@RequestBody CreateBadgeRequest request) {
-    return ResponseEntity.ok(userBadgeService.createNewBadge(request));
+    return ResponseEntity.ok(badgeService.createNewBadge(request));
   }
 
   @Operation(
@@ -50,7 +50,7 @@ public class UserBadgeController {
   )
   @PatchMapping("/update")
   public ResponseEntity<ResultResponse> updateBadge(@RequestBody UpdateBadgeRequest request) {
-    return ResponseEntity.ok(userBadgeService.updateBadge(request));
+    return ResponseEntity.ok(badgeService.updateBadge(request));
   }
 
   @Operation(
@@ -59,7 +59,7 @@ public class UserBadgeController {
   )
   @DeleteMapping("/delete/{id}")
   public ResponseEntity<ResultResponse> deleteBadge(@PathVariable("id") DeleteBadgeRequest request) {
-    return ResponseEntity.ok(userBadgeService.deleteBadge(request));
+    return ResponseEntity.ok(badgeService.deleteBadge(request));
   }
 
 }

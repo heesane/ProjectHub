@@ -4,6 +4,7 @@ import com.project.hub.model.dto.request.comments.DeleteCommentRequest;
 import com.project.hub.model.dto.request.comments.UpdateCommentRequest;
 import com.project.hub.model.dto.request.comments.WriteCommentRequest;
 import com.project.hub.model.dto.response.ResultResponse;
+import com.project.hub.service.CommentsService;
 import com.project.hub.service.impl.UserCommentsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/comments")
 public class UserCommentsController {
 
-  private final UserCommentsService userCommentsService;
+  private final CommentsService commentsService;
 
   @PostMapping("/post")
   @Operation(
@@ -38,7 +39,7 @@ public class UserCommentsController {
   public ResponseEntity<ResultResponse> postComment(
       @RequestBody WriteCommentRequest request) {
     log.info("request: {}", request);
-    ResultResponse response = userCommentsService.createComment(request);
+    ResultResponse response = commentsService.createComment(request);
     return ResponseEntity.ok(response);
   }
 
@@ -50,7 +51,7 @@ public class UserCommentsController {
   public ResponseEntity<ResultResponse> updateComment(
       HttpServletRequest request,
       @RequestBody UpdateCommentRequest updateCommentRequest) {
-    ResultResponse response = userCommentsService.updateComment(request,updateCommentRequest);
+    ResultResponse response = commentsService.updateComment(request,updateCommentRequest);
     return ResponseEntity.ok(response);
   }
 
@@ -61,7 +62,7 @@ public class UserCommentsController {
   )
   public ResponseEntity<ResultResponse> deleteComment(
       HttpServletRequest request,@RequestBody DeleteCommentRequest deleteCommentRequest) {
-    ResultResponse response = userCommentsService.deleteComment(request,deleteCommentRequest);
+    ResultResponse response = commentsService.deleteComment(request,deleteCommentRequest);
     return ResponseEntity.ok(response);
   }
 }

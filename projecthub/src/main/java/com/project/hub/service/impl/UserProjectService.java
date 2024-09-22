@@ -117,7 +117,7 @@ public class UserProjectService implements ProjectService {
 
     if (sort == Sorts.LATEST) {
       Pageable pageable = PageRequest.of(myProjectListRequest.getPage(), myProjectListRequest.getSize(),
-          Sort.by(Sort.Direction.DESC, "registeredAt"));
+          Sort.by(Sort.Direction.ASC, "registeredAt"));
       Page<Projects> sortedProjects = projectRepository.findAllByUserId(
           myProjectListRequest.getUserId(),
           pageable);
@@ -127,7 +127,8 @@ public class UserProjectService implements ProjectService {
 
       return new ListShortProjectDetail(collect);
 
-    } else if (sort == Sorts.LIKE) {
+    }
+    else if (sort == Sorts.LIKE) {
       Pageable pageable = PageRequest.of(myProjectListRequest.getPage(), myProjectListRequest.getSize(),
           Sort.by(Sort.Direction.DESC, "likeCounts"));
       Page<Projects> sortedProjects = projectRepository.findAllByUserId(myProjectListRequest.getUserId(), pageable);
@@ -136,7 +137,8 @@ public class UserProjectService implements ProjectService {
           .collect(Collectors.toList());
 
       return new ListShortProjectDetail(collect);
-    } else if (sort == Sorts.COMMENTS) {
+    }
+    else if (sort == Sorts.COMMENTS) {
       Pageable pageable = PageRequest.of(myProjectListRequest.getPage(), myProjectListRequest.getSize(),
           Sort.by(Sort.Direction.DESC, "comments"));
       Page<Projects> sortedProjects = projectRepository.findAllByUserId(

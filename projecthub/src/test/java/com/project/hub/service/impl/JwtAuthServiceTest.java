@@ -3,13 +3,12 @@ package com.project.hub.service.impl;
 import static com.project.hub.model.type.UserRole.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 import com.project.hub.auth.jwt.dto.JwtToken;
-import com.project.hub.auth.service.TokenComponent;
+import com.project.hub.auth.service.TokenService;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.exception.DuplicatedEmailException;
 import com.project.hub.exceptions.exception.NotFoundException;
@@ -19,7 +18,6 @@ import com.project.hub.model.dto.request.auth.UserRegisterRequest;
 import com.project.hub.model.dto.response.auth.UserRegisterResponse;
 import com.project.hub.repository.jpa.UserRepository;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,103 +36,46 @@ class JwtAuthServiceTest {
   private BCryptPasswordEncoder encoder;
 
   @Mock
-  private TokenComponent tokenComponent;
+  private TokenService tokenService;
 
   @InjectMocks
   private JwtAuthService jwtAuthService;
-
-  private UserRegisterRequest userRegisterRequest;
-
-  private User registerUser;
-
-  private User loginUser;
-
-  private UserLoginRequest userLoginRequest;
-
-  private UserLoginRequest invalidPasswordUserLoginRequest;
-
-  private UserLoginRequest invalidEmailUserLoginRequest;
-
-  private UserRegisterRequest duplicateEmailUserRegisterRequest;
-
-  @BeforeEach
-  void setUp() {
-
-    // 회원가입을 위한 유저 정보
-    registerUser = User.builder()
-        .id(1L)
-        .email("registerTest@gmail.com")
-        .nickname("registerTest")
-        .password("register")
-        .role(USER)
-        .build();
-
-    // 로그인을 위한 유저 정보
-    loginUser = User.builder()
-        .id(2L)
-        .email("loginTest@gmail.com")
-        .nickname("loginTest")
-        .password("login")
-        .role(USER)
-        .build();
-
-    // 정상 회원가입
-    userRegisterRequest = UserRegisterRequest.builder()
-        .email("registerTest@gmail.com")
-        .nickname("registerTest")
-        .password("register")
-        .build();
-
-    // 정상 로그인
-    userLoginRequest = UserLoginRequest.builder()
-        .email("loginTest@gmail.com")
-        .password("login")
-        .build();
-
-    // 중복 이메일 회원가입
-    duplicateEmailUserRegisterRequest = UserRegisterRequest.builder()
-        .email("registerTest@gmail.com")
-        .nickname("test2")
-        .password("test2")
-        .build();
-
-    // 비밀번호 불일치 로그인
-    invalidPasswordUserLoginRequest = UserLoginRequest.builder()
-        .email("loginTest@gmail.com")
-        .password("test3")
-        .build();
-
-    // 이메일 불일치 로그인
-    invalidEmailUserLoginRequest = UserLoginRequest.builder()
-        .email("test3@gmail.com")
-        .password("test3")
-        .build();
-
-  }
 
   @Test
   @DisplayName("정상적인 회원가입")
   void register() {
 
     //given
+    UserRegisterRequest userRegisterRequest = UserRegisterRequest.builder()
+        .email("register@gmail.com")
+        .nickname("register")
+        .password("register")
+        .build();
+
     given(userRepository.existsByEmail(userRegisterRequest.getEmail())).willReturn(false);
+    given(userRepository.existsByNickname(userRegisterRequest.getNickname())).willReturn(false);
 
     //when
     UserRegisterResponse register = jwtAuthService.register(userRegisterRequest);
 
     //then
-    assertEquals(register.getEmail(), registerUser.getEmail());
+    assertEquals(register.getEmail(), userRegisterRequest.getEmail());
   }
 
   @Test
   @DisplayName("이메일 중복으로 인한 회원가입 실패")
   void invalidEmailRegister() {
     //given
+    UserRegisterRequest userRegisterRequest = UserRegisterRequest.builder()
+        .email("register@gmail.com")
+        .nickname("register")
+        .password("register")
+        .build();
     given(userRepository.existsByEmail(anyString())).willReturn(true);
 
     //when&then
     assertThrows(DuplicatedEmailException.class, () -> {
-      jwtAuthService.register(duplicateEmailUserRegisterRequest);
+      jwtAuthService.register(userRegisterRequest);
     });
   }
 
@@ -143,8 +84,20 @@ class JwtAuthServiceTest {
   void login() {
 
     //given
-    given(userRepository.findByEmail(anyString())).willReturn(Optional.ofNullable(this.loginUser));
-    given(tokenComponent.generateToken(anyLong())).willReturn(
+    User user = User.builder()
+        .email("login@gmail.com")
+        .nickname("login")
+        .password("login")
+        .role(USER)
+        .build();
+
+    UserLoginRequest userLoginRequest = UserLoginRequest.builder()
+        .email("login@gmail.com")
+        .password("login")
+        .build();
+
+    given(userRepository.findByEmail(anyString())).willReturn(Optional.ofNullable(user));
+    given(tokenService.generateToken(anyString())).willReturn(
         JwtToken.builder().accessToken("accessToken").refreshToken("refreshToken").build());
 
     // when
@@ -160,8 +113,19 @@ class JwtAuthServiceTest {
   @DisplayName("비밀번호 불일치로 인한 로그인 실패")
   void unmatchedPasswordLogin() {
     //given
-    given(userRepository.findByEmail(anyString())).willReturn(Optional.ofNullable(loginUser));
+    User user = User.builder()
+        .email("login@gmail.com")
+        .nickname("login")
+        .password("login")
+        .role(USER)
+        .build();
 
+    UserLoginRequest invalidPasswordUserLoginRequest = UserLoginRequest.builder()
+        .email("login@gmail.com")
+        .password("invalidPassword")
+        .build();
+
+    given(userRepository.findByEmail(anyString())).willReturn(Optional.ofNullable(user));
     //when&then
     assertThrows(UnmatchedPasswordException.class, () -> {
       jwtAuthService.login(invalidPasswordUserLoginRequest);
@@ -172,11 +136,16 @@ class JwtAuthServiceTest {
   @DisplayName("로그인 실패")
   void failureLogin() {
     //given
-    given(userRepository.findByEmail(anyString())).willReturn(Optional.empty());
+    UserLoginRequest userLoginRequest = UserLoginRequest.builder()
+        .email("failLogin@gmail.com")
+        .password("test")
+        .build();
+
+    given(userRepository.findByEmail(userLoginRequest.getEmail())).willReturn(Optional.empty());
 
     //when&then
     assertThrows(NotFoundException.class, () -> {
-      jwtAuthService.login(invalidEmailUserLoginRequest);
+      jwtAuthService.login(userLoginRequest);
     });
   }
 }

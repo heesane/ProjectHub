@@ -73,6 +73,10 @@ public class ProjectDocuments implements DistributedLockInterface {
   private LocalDateTime deletedAt;
 
   public void update(Projects projects){
+    this.of(projects);
+  }
+
+  public ProjectDocuments of(Projects projects){
     this.title = projects.getTitle();
     this.subject = projects.getSubject();
     this.feature = projects.getFeature();
@@ -86,6 +90,7 @@ public class ProjectDocuments implements DistributedLockInterface {
     this.comments = projects.getComments() != null ? projects.getComments().stream().map(Comment::of).toList() : null;
     this.commentsCount = projects.getComments() != null ? (long)projects.getComments().size() : 0L;
     this.likeCount = projects.getLikeCounts();
+    return this;
   }
 
   @Override

@@ -81,7 +81,8 @@ public class UserLikeService implements LikeService {
       return ResultResponse.of(isProjectLike(key) ? ResultCode.PROJECT_DISLIKE_SUCCESS
           : ResultCode.COMMENT_DISLIKE_SUCCESS);
 
-    } else {
+    }
+    else {
       redisTemplate.opsForSet().add(key, userId);
       return ResultResponse.of(
           isProjectLike(key) ? ResultCode.PROJECT_LIKE_SUCCESS : ResultCode.COMMENT_LIKE_SUCCESS);

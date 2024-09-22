@@ -10,12 +10,13 @@ import com.project.hub.model.dto.request.projects.ProjectRequest;
 import com.project.hub.model.dto.request.projects.ProjectUpdateRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.type.ResultCode;
-import com.project.hub.service.impl.UserProjectService;
+import com.project.hub.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -37,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserProjectController {
 
-  private final UserProjectService userProjectService;
+  private final ProjectService projectService;
 
   @GetMapping(value = "/list")
   @Operation(
@@ -48,7 +49,7 @@ public class UserProjectController {
       @ModelAttribute ProjectListRequest projectListRequest) {
     return ResponseEntity.ok(
         ResultResponse.of(PROJECT_LIST_SUCCESS,
-            userProjectService.listProjects(projectListRequest)));
+            projectService.listProjects(projectListRequest)));
   }
 
   @GetMapping(value = "/{projectId}")
@@ -59,7 +60,7 @@ public class UserProjectController {
   public ResponseEntity<ResultResponse> getProjectDetail(
       @PathVariable("projectId") Long projectId) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_DETAIL_SUCCESS,
-        userProjectService.getProjectDetail(ProjectRequest.of(projectId))));
+        projectService.getProjectDetail(ProjectRequest.of(projectId))));
   }
 
   @GetMapping(value = "/myproject/list")
@@ -70,7 +71,7 @@ public class UserProjectController {
   public ResponseEntity<ResultResponse> getMyProjects(HttpServletRequest request,
       @ModelAttribute @Valid MyProjectListRequest myProjectListRequest) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_LIST_SUCCESS,
-        userProjectService.getMyProjectDetail(request,myProjectListRequest)));
+        projectService.getMyProjectDetail(request,myProjectListRequest)));
   }
 
   @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -80,9 +81,9 @@ public class UserProjectController {
   )
   public ResponseEntity<ResultResponse> createProject(
       @ModelAttribute @Valid ProjectCreateRequest request)
-      throws IOException {
+      throws IOException, NoSuchAlgorithmException {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_CREATE_SUCCESS,
-        userProjectService.createProject(request)));
+        projectService.createProject(request)));
   }
 
   @PatchMapping(value = "/update", consumes = {"multipart/form-data"})
@@ -93,9 +94,9 @@ public class UserProjectController {
   public ResponseEntity<ResultResponse> updateProject(
       HttpServletRequest request,
       @ModelAttribute @Valid ProjectUpdateRequest projectUpdateRequest)
-      throws IOException {
+      throws IOException, NoSuchAlgorithmException {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_UPDATE_SUCCESS,
-        userProjectService.updateProject(request,projectUpdateRequest)));
+        projectService.updateProject(request,projectUpdateRequest)));
   }
 
   @DeleteMapping(value = "/delete", consumes = {"application/json"})
@@ -107,7 +108,7 @@ public class UserProjectController {
       HttpServletRequest request,
       @RequestBody @Valid ProjectDeleteRequest projectDeleteRequest) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_DELETE_SUCCESS,
-        userProjectService.deleteProject(request, projectDeleteRequest)));
+        projectService.deleteProject(request, projectDeleteRequest)));
   }
 }
 

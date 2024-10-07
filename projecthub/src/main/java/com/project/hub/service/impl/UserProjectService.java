@@ -90,7 +90,7 @@ public class UserProjectService implements ProjectService {
 
       return new ListShortProjectDetail(collect);
     }
-    return null;
+    else throw new IllegalArgumentException("Invalid sort type");
   }
 
   @Override

@@ -1,13 +1,21 @@
 package com.project.hub.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.project.hub.entity.Comments;
+import com.project.hub.entity.Projects;
+import com.project.hub.entity.User;
+import com.project.hub.exceptions.exception.NotFoundException;
 import com.project.hub.model.documents.ProjectDocuments;
+import com.project.hub.model.mapper.ProjectDetail;
 import com.project.hub.model.type.SearchType;
 import com.project.hub.repository.document.ProjectDocumentsRepository;
 import com.project.hub.repository.jpa.ProjectRepository;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,7 +85,8 @@ class UserSearchServiceTest {
         ProjectDocuments.builder().id(1L).title("2 keyword 1").build(),
         ProjectDocuments.builder().id(2L).title("4 keyword 3").build()
     );
-    Page<ProjectDocuments> projectDocumentsList = new PageImpl<>(projects, pageable, projects.size());
+    Page<ProjectDocuments> projectDocumentsList = new PageImpl<>(projects, pageable,
+        projects.size());
 
     // when
     when(projectDocumentsRepository.findAll(pageable)).thenReturn(projectDocumentsList);
@@ -85,6 +94,131 @@ class UserSearchServiceTest {
     assertEquals(
         projectDocumentsList,
         userSearchService.findAllInElasticSearch(page, size, sort)
+    );
+  }
+
+  @DisplayName("title로 검색하기 실패 - 존재하지 않는 프로젝트")
+  @Test
+  void failSearchProjectByTitle() {
+    // given
+    String keyword = "keyword";
+
+    // when
+    when(projectDocumentsRepository.findByTitle(keyword)).thenReturn(Optional.empty());
+    // then
+    assertThrows(
+        NotFoundException.class,
+        () -> userSearchService.searchProjectByTitle(keyword)
+    );
+  }
+
+  @DisplayName("title로 검색하기")
+  @Test
+  void searchProjectByTitle() {
+    // given
+    String keyword = "keyword";
+
+    ProjectDocuments projectDocuments = ProjectDocuments.builder().id(1L).title("keyword").build();
+
+    // when
+    when(projectDocumentsRepository.findByTitle(keyword)).thenReturn(
+        Optional.ofNullable(projectDocuments));
+    // then
+    assertEquals(
+        projectDocuments,
+        userSearchService.searchProjectByTitle(keyword)
+    );
+  }
+
+  @DisplayName("title로 검색하기 - RDB")
+  @Test
+  void searchProjectByTitleInRDB() {
+    // given
+    String keyword = "keyword";
+
+    User test = User.builder()
+        .id(1L)
+        .nickname("testNickname")
+        .build();
+
+    List<Comments> comments = List.of(
+        Comments.builder()
+            .id(1L)
+            .user(test)
+            .contents("testContents")
+            .likes(1L)
+            .build()
+    );
+    Projects projects = Projects.builder()
+        .id(1L)
+        .title("keyword")
+        .subject("testSubject")
+        .user(test)
+        .comments(comments)
+        .build();
+
+    // when
+    when(projectRepository.findByTitle(keyword)).thenReturn(
+        Optional.ofNullable(projects));
+    // then
+    assertEquals(
+        "testSubject",
+        userSearchService.searchProjectByTitleInRDB(keyword).getSubject()
+    );
+  }
+
+  @DisplayName("title로 검색하기 실패  - RDB")
+  @Test
+  void failSearchProjectByTitleInRDB() {
+    String keyword = "keyword";
+
+    // when
+    when(projectRepository.findByTitle(keyword)).thenReturn(
+        Optional.empty());
+    // then
+    assertThrows(
+        NotFoundException.class,
+        () -> userSearchService.searchProjectByTitleInRDB(keyword)
+    );
+  }
+
+  @DisplayName("title로 검색하기 - RDB like")
+  @Test
+  void searchProjectByTitleInRDBLike() {
+    //given
+    String keyword = "keyword";
+
+    User test = User.builder()
+        .id(1L)
+        .nickname("testNickname")
+        .build();
+
+    List<Comments> comments = List.of(
+        Comments.builder()
+            .id(1L)
+            .user(test)
+            .contents("testContents")
+            .likes(1L)
+            .build()
+    );
+    Projects projects = Projects.builder()
+        .id(1L)
+        .title("keyword")
+        .subject("testSubject")
+        .user(test)
+        .comments(comments)
+        .build();
+    //when
+    when(projectRepository.findAllByTitleLike("%" + keyword + "%")).thenReturn(
+        List.of(
+            projects
+        )
+    );
+
+    //then
+    assertEquals(
+        "testSubject",
+        userSearchService.searchProjectByTitleInRDBLike(keyword).get(0).getSubject()
     );
   }
 }

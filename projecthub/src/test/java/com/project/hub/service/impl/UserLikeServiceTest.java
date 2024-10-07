@@ -6,8 +6,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.project.hub.entity.CommentLikes;
+import com.project.hub.entity.Comments;
 import com.project.hub.entity.ProjectLikes;
 import com.project.hub.entity.Projects;
+import com.project.hub.exceptions.exception.NotFoundException;
 import com.project.hub.model.dto.request.likes.BaseLikeRequest;
 import com.project.hub.model.dto.request.likes.CommentLikeRequest;
 import com.project.hub.model.dto.request.likes.ProjectLikeRequest;
@@ -21,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,20 +61,17 @@ class UserLikeServiceTest {
   private final static String COMMENT_LIKE_KEY = "comment:";
   private final static String PROJECT_LIKE_KEY = "project:";
 
-  @BeforeEach
-  void setUp() {
-    when(redisTemplate.opsForSet()).thenReturn(setOperations);
-  }
-
   @Test
   @DisplayName("프로젝트 좋아요 기능 - like")
   void projectLike() {
 
     // given
-    BaseLikeRequest baseLikeRequest = new ProjectLikeRequest(1L, LikeType.PROJECT,1L);
-    String key = LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + ((ProjectLikeRequest) baseLikeRequest).getProjectId();
+    BaseLikeRequest baseLikeRequest = new ProjectLikeRequest(1L, LikeType.PROJECT, 1L);
+    String key =
+        LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + ((ProjectLikeRequest) baseLikeRequest).getProjectId();
 
     // when
+    when(redisTemplate.opsForSet()).thenReturn(setOperations);
     when(setOperations.isMember(key, baseLikeRequest.getUserId().toString())).thenReturn(false);
     when(setOperations.add(key, baseLikeRequest.getUserId().toString())).thenReturn(1L);
 
@@ -88,10 +87,12 @@ class UserLikeServiceTest {
   void projectDislike() {
 
     // given
-    BaseLikeRequest baseLikeRequest = new ProjectLikeRequest(1L, LikeType.PROJECT,1L);
-    String key = LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + ((ProjectLikeRequest) baseLikeRequest).getProjectId();
+    BaseLikeRequest baseLikeRequest = new ProjectLikeRequest(1L, LikeType.PROJECT, 1L);
+    String key =
+        LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + ((ProjectLikeRequest) baseLikeRequest).getProjectId();
 
     // when
+    when(redisTemplate.opsForSet()).thenReturn(setOperations);
     when(setOperations.isMember(key, baseLikeRequest.getUserId().toString())).thenReturn(true);
     when(setOperations.remove(key, baseLikeRequest.getUserId().toString())).thenReturn(1L);
 
@@ -107,10 +108,12 @@ class UserLikeServiceTest {
   void commentLike() {
 
     // given
-    BaseLikeRequest baseLikeRequest = new CommentLikeRequest(1L, LikeType.COMMENT,1L);
-    String key = LIKE_KEY_PREFIX + COMMENT_LIKE_KEY + ((CommentLikeRequest) baseLikeRequest).getCommentId();
+    BaseLikeRequest baseLikeRequest = new CommentLikeRequest(1L, LikeType.COMMENT, 1L);
+    String key =
+        LIKE_KEY_PREFIX + COMMENT_LIKE_KEY + ((CommentLikeRequest) baseLikeRequest).getCommentId();
 
     // when
+    when(redisTemplate.opsForSet()).thenReturn(setOperations);
     when(setOperations.isMember(key, baseLikeRequest.getUserId().toString())).thenReturn(false);
     when(setOperations.add(key, baseLikeRequest.getUserId().toString())).thenReturn(1L);
 
@@ -126,10 +129,12 @@ class UserLikeServiceTest {
   void commentDislike() {
 
     // given
-    BaseLikeRequest baseLikeRequest = new CommentLikeRequest(1L, LikeType.COMMENT,1L);
-    String key = LIKE_KEY_PREFIX + COMMENT_LIKE_KEY + ((CommentLikeRequest) baseLikeRequest).getCommentId();
+    BaseLikeRequest baseLikeRequest = new CommentLikeRequest(1L, LikeType.COMMENT, 1L);
+    String key =
+        LIKE_KEY_PREFIX + COMMENT_LIKE_KEY + ((CommentLikeRequest) baseLikeRequest).getCommentId();
 
     // when
+    when(redisTemplate.opsForSet()).thenReturn(setOperations);
     when(setOperations.isMember(key, baseLikeRequest.getUserId().toString())).thenReturn(true);
     when(setOperations.remove(key, baseLikeRequest.getUserId().toString())).thenReturn(1L);
 
@@ -141,12 +146,13 @@ class UserLikeServiceTest {
   }
 
   @Test
-  void saveLikeCount() {
+  void saveProjectLikeCount() {
     // given
     LikeType likeType = LikeType.PROJECT;
     List<Long> projectIds = Arrays.asList(1L, 2L, 3L);
     when(projectsRepository.findAllIdWithDetail()).thenReturn(projectIds);
 
+    when(redisTemplate.opsForSet()).thenReturn(setOperations);
     // Mock Redis 키와 값
     for (Long projectId : projectIds) {
       String key = LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + projectId;
@@ -170,5 +176,28 @@ class UserLikeServiceTest {
       verify(projectsRepository, times(1)).findById(projectId);
       verify(projectsLikeRepository, times(3)).saveAndFlush(any(ProjectLikes.class));
     }
+  }
+
+  @Test
+  void failSaveLikeCountBecauseNoProject() {
+    // given
+    LikeType likeType = LikeType.PROJECT;
+    List<Long> projectIds = List.of(1L);
+
+    // Mock Redis 키와 값
+    for (Long projectId : projectIds) {
+      String key = LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + projectId;
+    }
+
+    // Mock Project 엔티티와 저장
+
+    // when
+    when(projectsRepository.findAllIdWithDetail()).thenReturn(projectIds);
+
+    // then
+    assertThrows(
+        NotFoundException.class,
+        () -> userLikeService.updateLikes(likeType)
+    );
   }
 }

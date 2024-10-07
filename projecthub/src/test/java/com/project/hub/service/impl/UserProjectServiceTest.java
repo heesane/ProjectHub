@@ -2,6 +2,7 @@ package com.project.hub.service.impl;
 
 import static com.project.hub.model.type.UserRole.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.project.hub.auth.service.TokenService;
 import com.project.hub.entity.Comments;
+import com.project.hub.entity.ProjectLikes;
 import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.exception.NotFoundException;
@@ -49,6 +51,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -98,11 +101,15 @@ class UserProjectServiceTest {
 
   private ProjectDeleteRequest failProjectDeleteRequest;
 
-  private MyProjectListRequest successMyProjectListRequest;
+  private MyProjectListRequest successMyProjectListRequestLATEST;
+  private MyProjectListRequest successMyProjectListRequestLIKE;
+  private MyProjectListRequest successMyProjectListRequestCOMMENT;
 
   private MyProjectListRequest failMyProjectListRequest;
 
-  private ProjectListRequest successProjectListRequest;
+  private ProjectListRequest successProjectListRequestLATEST;
+  private ProjectListRequest successProjectListRequestLIKE;
+  private ProjectListRequest successProjectListRequestCOMMENT;
 
   private ProjectListRequest failProjectListRequest;
 
@@ -231,13 +238,17 @@ class UserProjectServiceTest {
 
     failProjectDeleteRequest = new ProjectDeleteRequest(1L, 2L);
 
-    successMyProjectListRequest = new MyProjectListRequest(0, 5, Sorts.LATEST, 1L);
+    successMyProjectListRequestLATEST = new MyProjectListRequest(0, 5, Sorts.LATEST, 1L);
+    successMyProjectListRequestLIKE = new MyProjectListRequest(0, 5, Sorts.LIKE, 1L);
+    successMyProjectListRequestCOMMENT = new MyProjectListRequest(0, 5, Sorts.COMMENTS, 1L);
 
     failMyProjectListRequest = new MyProjectListRequest(0, 5, Sorts.LATEST, 2L);
 
-    successProjectListRequest = new ProjectListRequest(0, 5, Sorts.LATEST);
+    successProjectListRequestLATEST = new ProjectListRequest(0, 5, Sorts.LATEST);
+    successProjectListRequestLIKE = new ProjectListRequest(0, 5, Sorts.LIKE);
+    successProjectListRequestCOMMENT = new ProjectListRequest(0, 5, Sorts.COMMENTS);
 
-    failProjectListRequest = new ProjectListRequest(0, 5, Sorts.LATEST);
+    failProjectListRequest = new ProjectListRequest(0, 5, null);
 
     successProjectRequest = new ProjectRequest(1L);
 
@@ -255,7 +266,7 @@ class UserProjectServiceTest {
         .erdUrl("project2")
         .githubUrl("https://github.com/heesane2")
         .visible(false)
-        .likeCounts(0L)
+        .likeCounts(20L)
         .build();
 
     project3 = Projects.builder()
@@ -270,7 +281,7 @@ class UserProjectServiceTest {
         .erdUrl("project2")
         .githubUrl("https://github.com/heesane2")
         .visible(false)
-        .likeCounts(0L)
+        .likeCounts(30L)
         .build();
 
     comment1 = Comments.builder()
@@ -282,7 +293,7 @@ class UserProjectServiceTest {
 
   @Test
   @DisplayName("전체 프로젝트 리스트 조회 성공(최신순)")
-  void listProjects() {
+  void listProjectsLATEST() {
     // given
     project1 = Projects.builder()
         .id(1L)
@@ -308,9 +319,78 @@ class UserProjectServiceTest {
     when(projectRepository.findAll((Pageable) any())).thenReturn(projectPage);
     // then
     assertEquals(
-        userProjectService.listProjects(successProjectListRequest).getProjectDetails().size(), 2);
+        userProjectService.listProjects(successProjectListRequestLATEST).getProjectDetails().size(), 2);
     assertEquals("project1",
-        userProjectService.listProjects(successProjectListRequest).getProjectDetails().get(0)
+        userProjectService.listProjects(successProjectListRequestLATEST).getProjectDetails().get(0)
+            .getTitle());
+  }
+
+  @Test
+  @DisplayName("전체 프로젝트 리스트 조회 성공(좋아요순)")
+  void listProjectsLIKE() {
+    // given
+    project1 = Projects.builder()
+        .id(1L)
+        .user(successUser)
+        .title("project1")
+        .subject("project1")
+        .feature("project1")
+        .contents("project1")
+        .skills(skills1)
+        .tools(tools1)
+        .systemArchitectureUrl("project1")
+        .erdUrl("project1")
+        .githubUrl("https://github.com/heesane")
+        .likeCounts(10L)
+        .visible(true)
+        .build();
+
+    List<Projects> projects = List.of(project3, project2, project1);
+    Page<Projects> projectPage = new PageImpl<>(projects); // PageImpl을 사용하여 Page 객체 생성
+    // when
+    when(projectRepository.findAll((Pageable) any())).thenReturn(projectPage);
+    // then
+    assertEquals(
+        3,
+        userProjectService.listProjects(successProjectListRequestLIKE).getProjectDetails().size());
+
+    assertEquals(
+        "project1",
+        userProjectService.listProjects(successProjectListRequestLIKE).getProjectDetails().get(2)
+            .getTitle());
+
+  }
+
+  @Test
+  @DisplayName("전체 프로젝트 리스트 조회 성공(댓글순)")
+  void listProjects() {
+    // given
+    project1 = Projects.builder()
+        .id(1L)
+        .user(successUser)
+        .title("project1")
+        .subject("project1")
+        .feature("project1")
+        .contents("project1")
+        .skills(skills1)
+        .tools(tools1)
+        .systemArchitectureUrl("project1")
+        .erdUrl("project1")
+        .githubUrl("https://github.com/heesane")
+        .likeCounts(0L)
+        .visible(true)
+        .build();
+
+    List<Projects> projects = List.of(project2, project1, project3);
+    Page<Projects> projectPage = new PageImpl<>(projects); // PageImpl을 사용하여 Page 객체 생성
+    // when
+    when(projectRepository.findAllOrderByCommentsCountDesc(any())).thenReturn(projectPage);
+    // then
+    assertEquals(
+        3,
+        userProjectService.listProjects(successProjectListRequestCOMMENT).getProjectDetails().size());
+    assertEquals("project2",
+        userProjectService.listProjects(successProjectListRequestCOMMENT).getProjectDetails().get(0)
             .getTitle());
   }
 
@@ -357,6 +437,19 @@ class UserProjectServiceTest {
         () -> userProjectService.getProjectDetail(failProjectRequest));
   }
 
+  @DisplayName("마이프로필 조회 실패 - 사용자 불일치")
+  @Test
+  void failMyProfileBecauseUnmatchedUser(){
+      //given
+      //when
+    when(tokenService.extractEmail((HttpServletRequest) any())).thenReturn(
+        Optional.of("test@gmail.com"));
+    when(validator.validateAndGetUser(anyLong())).thenReturn(successUser);
+      //then
+    assertThrows(UnmatchedUserException.class,
+        () -> userProjectService.getMyProjectDetail(any(), successMyProjectListRequestLATEST));
+  }
+
   @Test
   @DisplayName("자신의 프로젝트 리스트 조회 성공(최신순)")
   void getMyProjectDetail() {
@@ -385,20 +478,112 @@ class UserProjectServiceTest {
 
     MockHttpServletRequest request = new MockHttpServletRequest();
 
-    Pageable pageable = PageRequest.of(successMyProjectListRequest.getPage(),
-        successMyProjectListRequest.getSize(),
+    Pageable pageable = PageRequest.of(successMyProjectListRequestLIKE.getPage(),
+        successMyProjectListRequestLIKE.getSize(),
         Sort.by(Sort.Direction.ASC, "registeredAt"));
 
     // when
     when(tokenService.extractEmail(request))
         .thenReturn(Optional.ofNullable(successUser.getEmail()));
-    when(validator.validateAndGetUser(successMyProjectListRequest.getUserId()))
+    when(validator.validateAndGetUser(successMyProjectListRequestLATEST.getUserId()))
         .thenReturn(successUser);
-    when(projectRepository.findAllByUserId(successMyProjectListRequest.getUserId(), pageable))
+    when(projectRepository.findAllByUserId(successMyProjectListRequestLATEST.getUserId(), pageable))
         .thenReturn(projectPage);
     // then
     assertEquals(project2.getTitle(),
-        userProjectService.getMyProjectDetail(request, successMyProjectListRequest)
+        userProjectService.getMyProjectDetail(request, successMyProjectListRequestLATEST)
+            .getProjectDetails()
+            .get(0).getTitle());
+
+  }
+
+  @Test
+  @DisplayName("자신의 프로젝트 리스트 조회 성공(좋아요순)")
+  void getMyProjectDetailLIKE() {
+    // given
+    project1 = Projects.builder()
+        .id(1L)
+        .user(successUser)
+        .title("project1")
+        .subject("project1")
+        .feature("project1")
+        .contents("project1")
+        .skills(skills1)
+        .tools(tools1)
+        .systemArchitectureUrl("project1")
+        .erdUrl("project1")
+        .githubUrl("https://github.com/heesane")
+        .likeCounts(0L)
+        .visible(true)
+        .comments(List.of(comment1))
+        .build();
+
+    List<Projects> projects = new ArrayList<>(List.of(project1, project2));
+    Page<Projects> projectPage = new PageImpl<>(projects); // PageImpl을 사용하여 Page 객체 생성
+
+    MockHttpServletRequest request = new MockHttpServletRequest();
+
+    // when
+    when(tokenService.extractEmail(request))
+        .thenReturn(Optional.ofNullable(successUser.getEmail()));
+    when(validator.validateAndGetUser(successMyProjectListRequestLIKE.getUserId()))
+        .thenReturn(successUser);
+    when(projectRepository.findAllByUserId(successMyProjectListRequestLIKE.getUserId(), PageRequest.of(
+        successMyProjectListRequestLIKE.getPage(),
+        successMyProjectListRequestLIKE.getSize(),
+        Sort.by(Direction.DESC, "likeCounts")))
+    ).thenReturn(projectPage);
+
+    // then
+    assertEquals(project1.getTitle(),
+        userProjectService.getMyProjectDetail(request, successMyProjectListRequestLIKE)
+            .getProjectDetails()
+            .get(0).getTitle());
+
+  }
+
+  @Test
+  @DisplayName("자신의 프로젝트 리스트 조회 성공(댓글순)")
+  void getMyProjectDetailCOMMENT() {
+    // given
+    project1 = Projects.builder()
+        .id(1L)
+        .user(successUser)
+        .title("project1")
+        .subject("project1")
+        .feature("project1")
+        .contents("project1")
+        .skills(skills1)
+        .tools(tools1)
+        .systemArchitectureUrl("project1")
+        .erdUrl("project1")
+        .githubUrl("https://github.com/heesane")
+        .likeCounts(0L)
+        .visible(true)
+        .comments(List.of(comment1))
+        .build();
+    project1.setRegisteredAt(LocalDateTime.of(2021, 1, 1, 0, 0));
+    project2.setRegisteredAt(LocalDateTime.of(2021, 1, 2, 0, 0));
+    List<Projects> projects = new ArrayList<>(List.of(project1, project2));
+    projects.sort((o1, o2) -> o2.getRegisteredAt().compareTo(o1.getRegisteredAt()));
+    Page<Projects> projectPage = new PageImpl<>(projects); // PageImpl을 사용하여 Page 객체 생성
+
+    MockHttpServletRequest request = new MockHttpServletRequest();
+
+    Pageable pageable = PageRequest.of(successMyProjectListRequestLIKE.getPage(),
+        successMyProjectListRequestLIKE.getSize(),
+        Sort.by(Sort.Direction.ASC, "registeredAt"));
+
+    // when
+    when(tokenService.extractEmail(request))
+        .thenReturn(Optional.ofNullable(successUser.getEmail()));
+    when(validator.validateAndGetUser(successMyProjectListRequestLATEST.getUserId()))
+        .thenReturn(successUser);
+    when(projectRepository.findAllByUserId(successMyProjectListRequestLATEST.getUserId(), pageable))
+        .thenReturn(projectPage);
+    // then
+    assertEquals(project2.getTitle(),
+        userProjectService.getMyProjectDetail(request, successMyProjectListRequestLATEST)
             .getProjectDetails()
             .get(0).getTitle());
 
@@ -488,12 +673,14 @@ class UserProjectServiceTest {
     // when
     when(tokenService.extractEmail((HttpServletRequest) any())).thenReturn(
         Optional.ofNullable(successUser.getEmail()));
-    when(projectRepository.findById(failProjectUpdateRequest.getProjectId())).thenReturn(Optional.of(project1));
+    when(projectRepository.findById(failProjectUpdateRequest.getProjectId())).thenReturn(
+        Optional.of(project1));
     when(validator.validateAndGetUser(failProjectUpdateRequest.getUserId())).thenReturn(failUser);
 
     // then
     assertThrows(UnmatchedUserException.class,
-        () -> userProjectService.updateProject((HttpServletRequest) any(),failProjectUpdateRequest));
+        () -> userProjectService.updateProject((HttpServletRequest) any(),
+            failProjectUpdateRequest));
   }
 
   @Test
@@ -522,7 +709,8 @@ class UserProjectServiceTest {
     when(validator.validateAndGetUser(anyLong())).thenReturn(successUser);
     when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project1));
 
-    ResultResponse resultResponse = userProjectService.deleteProject(any(),successProjectDeleteRequest);
+    ResultResponse resultResponse = userProjectService.deleteProject(any(),
+        successProjectDeleteRequest);
 
     //then
     assertEquals(resultResponse.getMessage(), ResultCode.PROJECT_DELETE_SUCCESS.getMessage());

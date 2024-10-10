@@ -17,6 +17,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -26,6 +32,7 @@ public class UserSearchService implements SearchService {
 
   private final ProjectDocumentsRepository projectDocumentsRepository;
   private final ProjectRepository projectRepository;
+  private final ElasticsearchOperations elasticsearchOperations;
 
   @Cacheable(value = "project", key = "#keyword + '_' + #page + '_' + #size + '_' + #searchType")
   @Override
@@ -36,12 +43,19 @@ public class UserSearchService implements SearchService {
       SearchType searchType) {
     Sort sortOption = Sort.by(Direction.DESC, searchType.getSort());
     Pageable pageable = PageRequest.of(page, size, sortOption);
-    return projectDocumentsRepository.findByTitleLike(keyword,pageable);
+
+    Query query = new CriteriaQuery(
+        new Criteria("contents").matches(keyword)
+    ).setPageable(pageable);
+    SearchHits<ProjectDocuments> searchHits = elasticsearchOperations.search(query, ProjectDocuments.class);
+
+    return searchHits.getSearchHits().stream().map(SearchHit::getContent).toList();
   }
 
   @Cacheable(value = "allProject", key = "#page + '_' + #size + '_' + #searchType")
   @Override
-  public Iterable<ProjectDocuments> findAllInElasticSearch(int page, int size, SearchType searchType) {
+  public Iterable<ProjectDocuments> findAllInElasticSearch(int page, int size,
+      SearchType searchType) {
     Sort sortOption = Sort.by(Direction.DESC, searchType.getSort());
     Pageable Page = PageRequest.of(page, size, sortOption);
 

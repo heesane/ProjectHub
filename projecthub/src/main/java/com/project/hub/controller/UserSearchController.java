@@ -43,8 +43,8 @@ public class UserSearchController {
 //  }
 
   @Operation(
-      summary = "프로젝트 제목으로 검색 (created, like, commentCount)",
-      description = "프로젝트 제목으로 검색합니다."
+      summary = "프로젝트 전문 검색 (created, like, commentCount)",
+      description = "프로젝트의 내용으로 검색합니다."
   )
   @GetMapping("")
   public ResponseEntity<ResultResponse> searchProjectByTitleLike(

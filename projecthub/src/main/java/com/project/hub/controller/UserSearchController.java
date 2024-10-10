@@ -1,15 +1,11 @@
 package com.project.hub.controller;
 
-import com.project.hub.model.documents.ProjectDocuments;
 import com.project.hub.model.dto.response.ResultResponse;
-import com.project.hub.model.mapper.ProjectDetail;
 import com.project.hub.model.type.ResultCode;
 import com.project.hub.model.type.SearchType;
 import com.project.hub.service.SearchService;
-import com.project.hub.service.impl.UserSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 사용자 검색 컨트롤러
- * Elasticsearch와 RDB 비교
- * 32.1% 감소
+ * 사용자 검색 컨트롤러 Elasticsearch와 RDB 비교 32.1% 감소
  */
 @Tag(name = "UserSearchController", description = "검색 API")
 @Slf4j
@@ -48,12 +42,13 @@ public class UserSearchController {
   )
   @GetMapping("")
   public ResponseEntity<ResultResponse> searchProjectByTitleLike(
-      @RequestParam(value="keyword") String keyword,
-      @RequestParam(value="page", defaultValue = "0") int page,
-      @RequestParam(value="size", defaultValue = "10") int size,
-      @RequestParam(value="sort", defaultValue = "id") SearchType sort
+      @RequestParam(value = "keyword") String keyword,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(value = "sort", defaultValue = "id") SearchType sort
   ) {
-    return ResponseEntity.ok(ResultResponse.of(ResultCode.SEARCH_SUCCESS,userSearchService.searchProjectByTitleLike(keyword, page, size, sort)));
+    return ResponseEntity.ok(ResultResponse.of(ResultCode.SEARCH_SUCCESS,
+        userSearchService.searchProjectByTitleLike(keyword, page, size, sort)));
   }
 
   @Operation(
@@ -62,11 +57,12 @@ public class UserSearchController {
   )
   @GetMapping("/all")
   public ResponseEntity<ResultResponse> findAllInElasticSearch(
-      @RequestParam(value="page", defaultValue = "0") int page,
-      @RequestParam(value="size", defaultValue = "10") int size,
-      @RequestParam(value="sort", defaultValue = "id") SearchType sort
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(value = "sort", defaultValue = "id") SearchType sort
   ) {
-    return ResponseEntity.ok(ResultResponse.of(ResultCode.SEARCH_SUCCESS,userSearchService.findAllInElasticSearch(page, size, sort)));
+    return ResponseEntity.ok(ResultResponse.of(ResultCode.SEARCH_SUCCESS,
+        userSearchService.findAllInElasticSearch(page, size, sort)));
   }
 
 //  @Operation(

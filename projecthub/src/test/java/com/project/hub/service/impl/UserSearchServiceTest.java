@@ -15,7 +15,6 @@ import com.project.hub.entity.Projects;
 import com.project.hub.entity.User;
 import com.project.hub.exceptions.exception.NotFoundException;
 import com.project.hub.model.documents.ProjectDocuments;
-import com.project.hub.model.mapper.ProjectDetail;
 import com.project.hub.model.type.SearchType;
 import com.project.hub.repository.document.ProjectDocumentsRepository;
 import com.project.hub.repository.jpa.ProjectRepository;
@@ -36,10 +35,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.TotalHitsRelation;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
 
 @ExtendWith(MockitoExtension.class)
 class UserSearchServiceTest {
@@ -86,7 +83,6 @@ class UserSearchServiceTest {
         .deletedAt(null) // 필수 필드 설정
         .build();
 
-
     ProjectDocuments doc2 = ProjectDocuments.builder()
         .id(1L)
         .title("4 keyword 2")
@@ -123,7 +119,8 @@ class UserSearchServiceTest {
         .thenReturn(mockSearchHits);
 
     // when
-    List<ProjectDocuments> result = userSearchService.searchProjectByTitleLike(keyword, page, size, sort);
+    List<ProjectDocuments> result = userSearchService.searchProjectByTitleLike(keyword, page, size,
+        sort);
 
     // then
     assertNotNull(result);
@@ -132,7 +129,8 @@ class UserSearchServiceTest {
     assertEquals("4 keyword 2", result.get(1).getTitle());
 
     // verify: ElasticsearchOperations의 search() 메서드가 호출되었는지 확인
-    verify(elasticsearchOperations, times(1)).search(any(CriteriaQuery.class), eq(ProjectDocuments.class));
+    verify(elasticsearchOperations, times(1)).search(any(CriteriaQuery.class),
+        eq(ProjectDocuments.class));
   }
 
   @Test

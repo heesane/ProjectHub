@@ -8,5 +8,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ListShortProjectDetail {
+
   private final List<ShortProjectDetail> projectDetails;
 }

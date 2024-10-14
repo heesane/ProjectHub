@@ -56,7 +56,7 @@ public class BadgeAspect {
         }
       }
 
-      if(userBadge != null && badgeUser.getBadge() != userBadge) {
+      if (userBadge != null && badgeUser.getBadge() != userBadge) {
         badgeUser.updateBadge(userBadge);
       }
       userRepository.saveAndFlush(badgeUser);

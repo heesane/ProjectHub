@@ -40,7 +40,7 @@ public class ProjectDetail {
     this.registeredAt = project.getRegisteredAt();
     this.comments = new CommentsList(project.getComments());
     this.likes = project.getLikeCounts();
-    this.commentCounts = (long)project.getComments().size();
+    this.commentCounts = (long) project.getComments().size();
 
   }
 }

@@ -12,16 +12,16 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableJpaRepositories(excludeFilters = @ComponentScan.Filter(
-		type = FilterType.ASSIGNABLE_TYPE,
-		classes = {
-				ProjectDocumentsRepository.class,
-		}
+    type = FilterType.ASSIGNABLE_TYPE,
+    classes = {
+        ProjectDocumentsRepository.class,
+    }
 ))
 @EnableCaching
 public class ProjecthubApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ProjecthubApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(ProjecthubApplication.class, args);
+  }
 
 }

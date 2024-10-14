@@ -47,7 +47,8 @@ public class UserSearchService implements SearchService {
     Query query = new CriteriaQuery(
         new Criteria("contents").matches(keyword)
     ).setPageable(pageable);
-    SearchHits<ProjectDocuments> searchHits = elasticsearchOperations.search(query, ProjectDocuments.class);
+    SearchHits<ProjectDocuments> searchHits = elasticsearchOperations.search(query,
+        ProjectDocuments.class);
 
     return searchHits.getSearchHits().stream().map(SearchHit::getContent).toList();
   }

@@ -71,7 +71,7 @@ public class UserProjectController {
   public ResponseEntity<ResultResponse> getMyProjects(HttpServletRequest request,
       @ModelAttribute @Valid MyProjectListRequest myProjectListRequest) {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_LIST_SUCCESS,
-        projectService.getMyProjectDetail(request,myProjectListRequest)));
+        projectService.getMyProjectDetail(request, myProjectListRequest)));
   }
 
   @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -96,7 +96,7 @@ public class UserProjectController {
       @ModelAttribute @Valid ProjectUpdateRequest projectUpdateRequest)
       throws IOException, NoSuchAlgorithmException {
     return ResponseEntity.ok(ResultResponse.of(ResultCode.PROJECT_UPDATE_SUCCESS,
-        projectService.updateProject(request,projectUpdateRequest)));
+        projectService.updateProject(request, projectUpdateRequest)));
   }
 
   @DeleteMapping(value = "/delete", consumes = {"application/json"})

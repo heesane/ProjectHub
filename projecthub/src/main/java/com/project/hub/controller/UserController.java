@@ -5,7 +5,6 @@ import com.project.hub.model.dto.request.user.UpdateUserProjectVisibleRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.type.ResultCode;
 import com.project.hub.service.UserService;
-import com.project.hub.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +35,8 @@ public class UserController {
   public ResponseEntity<ResultResponse> getProfile(HttpServletRequest request,
       HttpServletResponse response, @PathVariable Long userId) {
     return ResponseEntity.ok(
-        ResultResponse.of(ResultCode.USER_PROFILE_SUCCESS, userService.myProfile(request, response, userId)));
+        ResultResponse.of(ResultCode.USER_PROFILE_SUCCESS,
+            userService.myProfile(request, response, userId)));
   }
 
   @Operation(
@@ -48,7 +48,8 @@ public class UserController {
       HttpServletRequest request,
       @RequestBody UpdateUserProfileRequest updateUserProfileRequest) {
     return ResponseEntity.ok(
-        ResultResponse.of(ResultCode.USER_UPDATE_SUCCESS, userService.changeNickname(request, updateUserProfileRequest)));
+        ResultResponse.of(ResultCode.USER_UPDATE_SUCCESS,
+            userService.changeNickname(request, updateUserProfileRequest)));
   }
 
   @Operation(
@@ -60,6 +61,7 @@ public class UserController {
       HttpServletRequest request,
       @RequestBody UpdateUserProjectVisibleRequest updateUserProjectVisibleRequest) {
     return ResponseEntity.ok(
-        ResultResponse.of(ResultCode.USER_VISIBLE_SUCCESS, userService.changeVisible(request,updateUserProjectVisibleRequest)));
+        ResultResponse.of(ResultCode.USER_VISIBLE_SUCCESS,
+            userService.changeVisible(request, updateUserProjectVisibleRequest)));
   }
 }

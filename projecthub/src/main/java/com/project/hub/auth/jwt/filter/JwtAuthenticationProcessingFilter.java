@@ -35,7 +35,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
     if (NO_CHECK_URL.contains(request.getRequestURI())) {
       filterChain.doFilter(request, response);
       return;
@@ -53,11 +54,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     checkAccessTokenAndAuthentication(request, response, filterChain);
   }
 
-  public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
+  public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response,
+      String refreshToken) {
     userRepository.findByRefreshToken(refreshToken)
         .ifPresent(user -> {
           String reIssuedRefreshToken = reIssueRefreshToken(user);
-          tokenService.sendAccessAndRefreshToken(response, tokenService.generateAccessToken(user.getEmail()),
+          tokenService.sendAccessAndRefreshToken(response,
+              tokenService.generateAccessToken(user.getEmail()),
               reIssuedRefreshToken);
         });
   }
@@ -69,7 +72,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     return reIssuedRefreshToken;
   }
 
-  public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
+  public void checkAccessTokenAndAuthentication(HttpServletRequest request,
+      HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     log.info("checkAccessTokenAndAuthentication() 호출");
     tokenService.extractAccessToken(request)

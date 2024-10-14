@@ -8,7 +8,8 @@ import com.project.hub.model.documents.ProjectDocuments;
 public class UpdateManager {
 
   @DistributedLock
-  public static void incrementProjectCommentCount(ProjectDocuments projectDocuments, Projects projects) {
+  public static void incrementProjectCommentCount(ProjectDocuments projectDocuments,
+      Projects projects) {
     projectDocuments.update(projects);
   }
 

@@ -58,7 +58,8 @@ public class UserBadgeController {
       description = "기존 뱃지를 삭제합니다."
   )
   @DeleteMapping("/delete/{id}")
-  public ResponseEntity<ResultResponse> deleteBadge(@PathVariable("id") DeleteBadgeRequest request) {
+  public ResponseEntity<ResultResponse> deleteBadge(
+      @PathVariable("id") DeleteBadgeRequest request) {
     return ResponseEntity.ok(badgeService.deleteBadge(request));
   }
 

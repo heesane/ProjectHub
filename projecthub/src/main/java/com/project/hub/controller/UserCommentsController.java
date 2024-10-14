@@ -5,7 +5,6 @@ import com.project.hub.model.dto.request.comments.UpdateCommentRequest;
 import com.project.hub.model.dto.request.comments.WriteCommentRequest;
 import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.service.CommentsService;
-import com.project.hub.service.impl.UserCommentsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,7 +50,7 @@ public class UserCommentsController {
   public ResponseEntity<ResultResponse> updateComment(
       HttpServletRequest request,
       @RequestBody UpdateCommentRequest updateCommentRequest) {
-    ResultResponse response = commentsService.updateComment(request,updateCommentRequest);
+    ResultResponse response = commentsService.updateComment(request, updateCommentRequest);
     return ResponseEntity.ok(response);
   }
 
@@ -61,8 +60,8 @@ public class UserCommentsController {
       description = "댓글 삭제"
   )
   public ResponseEntity<ResultResponse> deleteComment(
-      HttpServletRequest request,@RequestBody DeleteCommentRequest deleteCommentRequest) {
-    ResultResponse response = commentsService.deleteComment(request,deleteCommentRequest);
+      HttpServletRequest request, @RequestBody DeleteCommentRequest deleteCommentRequest) {
+    ResultResponse response = commentsService.deleteComment(request, deleteCommentRequest);
     return ResponseEntity.ok(response);
   }
 }

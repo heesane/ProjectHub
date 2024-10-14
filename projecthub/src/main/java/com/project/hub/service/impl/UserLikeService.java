@@ -81,8 +81,7 @@ public class UserLikeService implements LikeService {
       return ResultResponse.of(isProjectLike(key) ? ResultCode.PROJECT_DISLIKE_SUCCESS
           : ResultCode.COMMENT_DISLIKE_SUCCESS);
 
-    }
-    else {
+    } else {
       redisTemplate.opsForSet().add(key, userId);
       return ResultResponse.of(
           isProjectLike(key) ? ResultCode.PROJECT_LIKE_SUCCESS : ResultCode.COMMENT_LIKE_SUCCESS);
@@ -102,15 +101,16 @@ public class UserLikeService implements LikeService {
 
     // key scan 개선
     // scan 방식에서 Project id를 추출하여 해당 Project Entity를 조회하고 좋아요 수를 업데이트
-    List<Long> targetsId = likeType == LikeType.PROJECT ? projectsRepository.findAllIdWithDetail() : commentsRepository.findAllIdWithDetail();
+    List<Long> targetsId = likeType == LikeType.PROJECT ? projectsRepository.findAllIdWithDetail()
+        : commentsRepository.findAllIdWithDetail();
     for (Long targetId : targetsId) {
       String key = LIKE_KEY_PREFIX + PROJECT_LIKE_KEY + targetId;
-      updateLikeCount(key,targetId);
+      updateLikeCount(key, targetId);
     }
   }
 
   @Transactional
-  public void updateLikeCount(String fullKey,Long targetId) {
+  public void updateLikeCount(String fullKey, Long targetId) {
     // Key에 따른 LikeType 설정
     // like:project:1 -> LikeType.PROJECT, like:comment:1 -> LikeType.COMMENT
     LikeType likeType = fullKey.contains(PROJECT_LIKE_KEY) ? LikeType.PROJECT : LikeType.COMMENT;
@@ -131,8 +131,7 @@ public class UserLikeService implements LikeService {
           userId -> updateProjectLikeTable(targetId, Long.parseLong(userId)));
       // 업데이트 된 Project Entity 저장
       projectsRepository.saveAndFlush(project);
-    }
-    else {
+    } else {
       Comments comments = commentsRepository.findById(targetId).orElseThrow(
           () -> new NotFoundException(ExceptionCode.COMMENTS_NOT_FOUND)
       );
@@ -169,7 +168,7 @@ public class UserLikeService implements LikeService {
   }
 
   private Long getLikeCount(String key) {
-    if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
+    if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
       return redisTemplate.opsForSet().size(key);
     }
     return 0L;

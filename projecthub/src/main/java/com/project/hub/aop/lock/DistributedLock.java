@@ -12,6 +12,8 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 public @interface DistributedLock {
+
   long waitTime() default 5L;   // 락을 기다릴 최대 시간 (초)
+
   long leaseTime() default 3L;   // 락을 유지할 시간 (초)
 }

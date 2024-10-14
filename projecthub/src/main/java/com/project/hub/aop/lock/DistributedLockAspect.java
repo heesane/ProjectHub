@@ -21,7 +21,7 @@ public class DistributedLockAspect {
       ProceedingJoinPoint pjp,
       DistributedLock distributedLock,
       DistributedLockInterface entity
-      ) throws Throwable {
+  ) throws Throwable {
 
     long waitTime = distributedLock.waitTime();
     long leaseTime = distributedLock.leaseTime();

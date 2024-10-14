@@ -6,6 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class CreateBadgeRequest {
+
   private final String name;
   private final String description;
   private final Long requiredProjects;

@@ -30,22 +30,22 @@ public class ProjectDocuments implements DistributedLockInterface {
   @Field(name = "id", type = FieldType.Keyword)
   private Long id;
 
-  @Field(name = "title", type = FieldType.Keyword)
+  @Field(name = "title", type = FieldType.Text)
   private String title;
 
-  @Field(name = "subject", type = FieldType.Keyword)
+  @Field(name = "subject", type = FieldType.Text)
   private String subject;
 
-  @Field(name = "feature", type = FieldType.Keyword)
+  @Field(name = "feature", type = FieldType.Text)
   private String feature;
 
-  @Field(name = "contents", type = FieldType.Keyword)
+  @Field(name = "contents", type = FieldType.Text)
   private String contents;
 
-  @Field(name = "skills", type = FieldType.Keyword)
+  @Field(name = "skills", type = FieldType.Text)
   private List<String> skills;
 
-  @Field(name = "tools", type = FieldType.Keyword)
+  @Field(name = "tools", type = FieldType.Text)
   private List<String> tools;
 
   @Field(name = "system_architecture", type = FieldType.Text)
@@ -72,11 +72,11 @@ public class ProjectDocuments implements DistributedLockInterface {
   @Field(name = "deleted_at", type = FieldType.Keyword)
   private LocalDateTime deletedAt;
 
-  public void update(Projects projects){
+  public void update(Projects projects) {
     this.of(projects);
   }
 
-  public ProjectDocuments of(Projects projects){
+  public ProjectDocuments of(Projects projects) {
     this.title = projects.getTitle();
     this.subject = projects.getSubject();
     this.feature = projects.getFeature();
@@ -87,8 +87,10 @@ public class ProjectDocuments implements DistributedLockInterface {
     this.erd = projects.getErdUrl();
     this.githubLink = projects.getGithubUrl();
     this.authorName = projects.getUser().getNickname();
-    this.comments = projects.getComments() != null ? projects.getComments().stream().map(Comment::of).toList() : null;
-    this.commentsCount = projects.getComments() != null ? (long)projects.getComments().size() : 0L;
+    this.comments =
+        projects.getComments() != null ? projects.getComments().stream().map(Comment::of).toList()
+            : null;
+    this.commentsCount = projects.getComments() != null ? (long) projects.getComments().size() : 0L;
     this.likeCount = projects.getLikeCounts();
     return this;
   }

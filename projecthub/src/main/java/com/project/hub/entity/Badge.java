@@ -36,7 +36,7 @@ public class Badge {
   @Column(name = "required_comment_count", nullable = false)
   private Long requiredCommentCount;
 
-  public void update(UpdateBadgeRequest request){
+  public void update(UpdateBadgeRequest request) {
     this.name = request.getName();
     this.description = request.getDescription();
     this.requiredProjectCount = request.getRequiredProjects();

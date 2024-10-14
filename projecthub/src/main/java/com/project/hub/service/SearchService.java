@@ -7,7 +7,8 @@ import java.util.List;
 
 public interface SearchService {
 
-  List<ProjectDocuments> searchProjectByTitleLike(String keyword, int page, int size, SearchType sort);
+  List<ProjectDocuments> searchProjectByTitleLike(String keyword, int page, int size,
+      SearchType sort);
 
   ProjectDocuments searchProjectByTitle(String keyword);
 

@@ -22,16 +22,19 @@ public interface ProjectService {
   ProjectDetailResponse getProjectDetail(ProjectRequest request);
 
   // 내 프로젝트 전체 조회
-  ListShortProjectDetail getMyProjectDetail(HttpServletRequest request, MyProjectListRequest myProjectListRequest);
+  ListShortProjectDetail getMyProjectDetail(HttpServletRequest request,
+      MyProjectListRequest myProjectListRequest);
 
   // 등록
   ResultResponse createProject(ProjectCreateRequest request)
       throws IOException, NoSuchAlgorithmException;
 
   // 수정
-  ResultResponse updateProject(HttpServletRequest request, ProjectUpdateRequest projectUpdateRequest)
+  ResultResponse updateProject(HttpServletRequest request,
+      ProjectUpdateRequest projectUpdateRequest)
       throws IOException, NoSuchAlgorithmException;
 
   // 삭제
-  ResultResponse deleteProject(HttpServletRequest request, ProjectDeleteRequest projectDeleteRequest);
+  ResultResponse deleteProject(HttpServletRequest request,
+      ProjectDeleteRequest projectDeleteRequest);
 }

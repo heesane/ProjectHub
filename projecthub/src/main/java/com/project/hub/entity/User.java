@@ -30,7 +30,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE member SET deleted_at = now() WHERE id = ?")
 @Table(name = "member")
-public class User extends BaseTimeEntity{
+public class User extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,16 +62,18 @@ public class User extends BaseTimeEntity{
   private List<Projects> projects;
 
   @OneToOne
-  @JoinColumn(name="badge_id")
+  @JoinColumn(name = "badge_id")
   private Badge badge;
 
-  public void updateBadge(Badge badge){
+  public void updateBadge(Badge badge) {
     this.badge = badge;
   }
-  public void updateNickname(String nickname){
+
+  public void updateNickname(String nickname) {
     this.nickname = nickname;
   }
-  public void updateRefreshToken(String refreshToken){
+
+  public void updateRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
   }
 }

@@ -94,7 +94,7 @@ public class PictureManager {
     if (targetFile.delete()) {
       log.debug("파일이 삭제되었습니다.");
     } else {
-      log.error("{} 파일이 삭제되지 못했습니다.",targetFile.getName());
+      log.error("{} 파일이 삭제되지 못했습니다.", targetFile.getName());
     }
   }
 

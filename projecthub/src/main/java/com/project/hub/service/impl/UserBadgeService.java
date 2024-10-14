@@ -11,7 +11,6 @@ import com.project.hub.model.dto.response.ResultResponse;
 import com.project.hub.model.type.ResultCode;
 import com.project.hub.repository.jpa.BadgeRepository;
 import com.project.hub.service.BadgeService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +30,7 @@ public class UserBadgeService implements BadgeService {
   @Transactional
   public ResultResponse createNewBadge(CreateBadgeRequest request) {
 
-    if(badgeRepository.existsByName(request.getName())){
+    if (badgeRepository.existsByName(request.getName())) {
       throw new DuplicateBadgeException(ExceptionCode.BADGE_ALREADY_EXISTS);
     }
 
@@ -67,7 +66,7 @@ public class UserBadgeService implements BadgeService {
 
     Long badgeId = request.getId();
 
-    if(!badgeRepository.existsById(badgeId)){
+    if (!badgeRepository.existsById(badgeId)) {
       throw new NotFoundException(ExceptionCode.BADGE_NOT_FOUND);
     }
 

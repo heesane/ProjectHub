@@ -75,14 +75,14 @@ public class Validator {
   }
 
   public List<ProjectLikes> validateAndGetProjectLike(Long userId) {
-    if(!userRepository.existsById(userId)) {
+    if (!userRepository.existsById(userId)) {
       throw new NotFoundException(ExceptionCode.USER_NOT_FOUND);
     }
     return projectsLikeRepository.findAllByUserId(userId);
   }
 
   public List<CommentLikes> validateAndGetCommentLike(Long userId) {
-    if(!userRepository.existsById(userId)) {
+    if (!userRepository.existsById(userId)) {
       throw new NotFoundException(ExceptionCode.USER_NOT_FOUND);
     }
     return commentsLikeRepository.findAllByUserId(userId);

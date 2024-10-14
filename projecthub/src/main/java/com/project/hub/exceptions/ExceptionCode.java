@@ -26,7 +26,7 @@ public enum ExceptionCode {
   UNMATCHED_PROJECT_OWNER(HttpStatus.FORBIDDEN.value(), "P002", "프로젝트 소유자가 아님"),
 
   // Comments
-  COMMENTS_NOT_FOUND(HttpStatus.NOT_FOUND.value(),"C001","댓글을 찾을 수 없음"),
+  COMMENTS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "C001", "댓글을 찾을 수 없음"),
 
   // Project Documents
   PROJECT_DOCUMENTS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "PD001", "프로젝트 문서를 찾을 수 없음"),

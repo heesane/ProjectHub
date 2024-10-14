@@ -75,7 +75,8 @@ public class UserAuthController {
   public ResponseEntity<ResultResponse> loginError(
       @RequestParam(value = "message", required = false) String message) {
     log.error("로그인 오류 발생 : {}", message);
-    return ResponseEntity.badRequest().body(ResultResponse.of(USER_LOGIN_FAIL, "로그인 오류 발생 : " + message));
+    return ResponseEntity.badRequest()
+        .body(ResultResponse.of(USER_LOGIN_FAIL, "로그인 오류 발생 : " + message));
 
   }
 }

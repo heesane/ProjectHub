@@ -27,7 +27,8 @@ public class UserLikeController {
       description = "프로젝트, 댓글 좋아요"
   )
   @PostMapping("/project")
-  public ResponseEntity<ResultResponse> projectLike(@RequestBody @Valid ProjectLikeRequest request){
+  public ResponseEntity<ResultResponse> projectLike(
+      @RequestBody @Valid ProjectLikeRequest request) {
     return ResponseEntity.ok(likeService.like(request));
   }
 
@@ -36,7 +37,8 @@ public class UserLikeController {
       description = "댓글 좋아요"
   )
   @PostMapping("/comment")
-  public ResponseEntity<ResultResponse> commentLike(@RequestBody @Valid CommentLikeRequest request){
+  public ResponseEntity<ResultResponse> commentLike(
+      @RequestBody @Valid CommentLikeRequest request) {
     return ResponseEntity.ok(likeService.like(request));
   }
 }

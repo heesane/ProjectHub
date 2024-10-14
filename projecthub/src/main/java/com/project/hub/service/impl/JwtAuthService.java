@@ -96,10 +96,10 @@ public class JwtAuthService implements AuthService {
 
   @Transactional
   @Override
-  public ResponseEntity<ResultResponse> oauth2Login(String code, String state){
+  public ResponseEntity<ResultResponse> oauth2Login(String code, String state) {
 
-    if(code!=null){
-      try{
+    if (code != null) {
+      try {
 
         String accessToken = exchangeCodeForToken(code);
         Map userInfo = getUserInfo(accessToken);
@@ -112,9 +112,9 @@ public class JwtAuthService implements AuthService {
           HttpHeaders httpHeaders = new HttpHeaders();
           httpHeaders.add("Access-Token", token.accessToken());
           httpHeaders.add("Refresh-Token", token.refreshToken());
-          return ResponseEntity.ok().headers(httpHeaders).body(ResultResponse.of(ResultCode.USER_OAUTH_LOGIN_SUCCESS));
-        }
-        else {
+          return ResponseEntity.ok().headers(httpHeaders)
+              .body(ResultResponse.of(ResultCode.USER_OAUTH_LOGIN_SUCCESS));
+        } else {
 
           userRepository.save(
               User.builder()
@@ -131,13 +131,14 @@ public class JwtAuthService implements AuthService {
           httpHeaders.add("Access-Token", token.accessToken());
           httpHeaders.add("Refresh-Token", token.refreshToken());
 
-          return ResponseEntity.ok().headers(httpHeaders).body(ResultResponse.of(ResultCode.USER_OAUTH_REGISTER_SUCCESS));
+          return ResponseEntity.ok().headers(httpHeaders)
+              .body(ResultResponse.of(ResultCode.USER_OAUTH_REGISTER_SUCCESS));
         }
       } catch (Exception e) {
         log.error("OAuth2 Login Error: {}", e.getMessage());
         throw new BusinessException(ExceptionCode.ERROR_OAUTH);
       }
-    }else {
+    } else {
       throw new BusinessException(ExceptionCode.INVALID_OAUTH_CODE);
     }
   }

@@ -68,7 +68,8 @@ public class UserCommentsService implements CommentsService {
 
       commentsRepository.save(newComments);
 
-      UpdateManager.incrementProjectCommentCount(projectDocuments, validator.validateAndGetProject(request.getProjectId()));
+      UpdateManager.incrementProjectCommentCount(projectDocuments,
+          validator.validateAndGetProject(request.getProjectId()));
 
       projectDocumentsRepository.save(projectDocuments);
 
@@ -100,7 +101,7 @@ public class UserCommentsService implements CommentsService {
 
     User user = validator.validateAndGetUser(updateCommentRequest.getUserId());
 
-    if(!user.getEmail().equals(userEmail)) {
+    if (!user.getEmail().equals(userEmail)) {
       throw new UnmatchedUserException();
     }
 

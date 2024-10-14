@@ -6,6 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class UpdateUserProjectVisibleRequest {
+
   private final Long userId;
   private final Long projectId;
 }
